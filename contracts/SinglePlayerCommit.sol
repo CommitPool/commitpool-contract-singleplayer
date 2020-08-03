@@ -65,7 +65,9 @@ contract SinglePlayerCommit is Ownable {
 
     mapping(address => Commitment) public commitments; // active commitments
     address[] public committers; // addresses with active commitments
+
     mapping(address => uint256) public balances; // current token balances
+    uint256 public committerBalance; // sum of current token balances
 
     address public owner;
 
@@ -118,8 +120,7 @@ contract SinglePlayerCommit is Ownable {
             "SinglePlayerCommit::deposit - token transfer failed"
         );
 
-        // record deposit in committer's balance
-        balances[msg.sender] = balances[msg.sender].add(amount);
+        _changeCommitterBalance(amount, true);
 
         emit Deposit(msg.sender, amount);
     }
@@ -176,7 +177,8 @@ contract SinglePlayerCommit is Ownable {
         uint256 available = balances[msg.sender].sub(commitments[msg.sender].stake);
         require(amount >= available, "SinglePlayerCommit::withdraw - not enough balance available");
 
-        balances[msg.sender] = balances[msg.sender].sub(amount);
+        // remove from committer's balance
+        _changeCommitterBalance(amount, false);
 
         require(token.transfer(msg.sender, amount), "SinglePlayerCommit::withdraw - token transfer failed");
 
@@ -209,7 +211,8 @@ contract SinglePlayerCommit is Ownable {
             penalty = 0;
         } else {
             penalty = stake;
-            balances[msg.sender] = balances[msg.sender].sub(penalty);
+            // remove from committer's balance
+            _changeCommitterBalance(penalty, false);
         }
 
         emit CommitmentEnded(committer, met, penalty);
@@ -219,6 +222,14 @@ contract SinglePlayerCommit is Ownable {
         for (uint256 i = 0; i < committers.length; i.add(1)) {
             processCommitment(committers[i]);
         }
+    function ownerWithdraw(uint256 amount) public onlyOwner returns (bool) {
+        uint256 available = token.balance(address(this)).sub(committerBalance);
+
+        require(amount <= available, "SinglePlayerCommit::ownerWithdraw - not enough available balance");
+
+        require(token.transfer(msg.sender, amount), "SinglePlayerCommit::ownerWithdraw - token transfer failed");
+
+        return true;
     }
 
     function _addMeasure(string memory _name) internal returns (uint256 index) {
@@ -248,5 +259,21 @@ contract SinglePlayerCommit is Ownable {
         allowedActivities.push(activity);
 
         return activityIndex;
+    }
+
+    function _changeCommitterBalance(uint256 amount, bool add) internal returns (bool) {
+        if (add) {
+            // increase committer's token balance
+            balances[msg.sender] = balances[msg.sender].add(amount);
+            // add to total committer balance sum
+            committerBalance = committerBalance.add(amount);
+        } else {
+            // decrease committer's token balance
+            balances[msg.sender] = balances[msg.sender].sub(amount);
+            // decrease total committer balance sum
+            committerBalance = committerBalance.sub(amount);
+        }
+
+        return true;
     }
 }
