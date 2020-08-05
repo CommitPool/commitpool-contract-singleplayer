@@ -1,10 +1,11 @@
 /* SPDX-License-Identifier: MIT */
 pragma solidity ^0.6.9;
+pragma experimental ABIEncoderV2;
 
 import "@nomiclabs/buidler/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/token/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract SinglePlayerCommit is Ownable {
     using SafeMath for uint256;
@@ -25,19 +26,21 @@ contract SinglePlayerCommit is Ownable {
 
     struct Activity {
         string name; // e.g. "cycling"
-        mapping(uint256 => uint256[]) measures; // index from allowedMeasures[] => [min, max] values
+        bytes32[] measures; // keys from allowedMeasures
+        uint256[2][] ranges; // array of [min,max] goal values
         address oracle;
         bool allowed;
     }
 
     struct Commitment {
         address committer; // user
-        uint256 activityIndex; // index from allowedActivities[]
-        uint256 measureIndex; // index from allowedMeasures[]
-        uint256 commitValue; // must be within range of Activity.measures[measureIndex]
-        uint256 startTime;
-        uint256 endTime;
+        bytes32 activity; // key from allowedActivities
+        bytes32 measure; // key from allowedMeasures
+        uint256 goalValue; // must be within range of Activity.measures[measureIndex]
+        uint256 start;
+        uint256 end;
         uint256 stake; // amount of token staked, scaled by token decimals
+        bool exists; // flag to help check if commitment exists
         uint256 reportedValue; // as reported by oracle
         bool met; // whether the commitment has been met
     }
@@ -60,16 +63,17 @@ contract SinglePlayerCommit is Ownable {
     /******************
     INTERNAL ACCOUNTING
     ******************/
-    Activity[] public allowedActivities; // array of eligible activities
-    Measure[] public allowedMeasures; // array of eligible measures
+    mapping(bytes32 => Activity) public allowedActivities;
+    bytes32[] public activityList;
+
+    mapping(bytes32 => Measure) public allowedMeasures;
+    bytes32[] public measureList;
 
     mapping(address => Commitment) public commitments; // active commitments
-    address[] public committers; // addresses with active commitments
+    // address[] public committers; // addresses with active commitments
 
     mapping(address => uint256) public balances; // current token balances
     uint256 public committerBalance; // sum of current token balances
-
-    address public owner;
 
     /********
     FUNCTIONS
@@ -77,22 +81,23 @@ contract SinglePlayerCommit is Ownable {
     // constructor
     constructor(
         string memory _activity,
-        string memory _measure,
-        uint256[] _range,
+        string[] memory _measures,
+        uint256[2][] memory _ranges,
         address _oracle,
         address _token
     ) public {
         // set up token interface
         token = IERC20(_token);
 
-        // set owner
-        owner = msg.sender;
-
-        // register measure
-        measureIndex = _addMeasure(_measure);
+        bytes32[] memory measureKeys;
+        // register measures
+        for (uint256 i = 0; i < _measures.length; i.add(1)) {
+            bytes32 measureKey = _addMeasure(_measures[i]);
+            measureKeys[i] = measureKey;
+        }
 
         // register activity
-        _addActivity(_activity, measureIndex, _range, _oracle);
+        _addActivity(_activity, measureKeys, _ranges, _oracle);
     }
 
     // fallback function (if exists)
@@ -100,7 +105,7 @@ contract SinglePlayerCommit is Ownable {
 
     // public functions
     function depositAndCommit(
-        uint256 _activityIndex,
+        bytes32 _activity,
         uint256 _measureIndex,
         uint256 _goal,
         uint256 _startTime,
@@ -110,7 +115,7 @@ contract SinglePlayerCommit is Ownable {
         require(deposit(_depositAmount), "SinglePlayerCommit::depositAndCommit - deposit failed");
 
         require(
-            makeCommitment(activityIndex, _measureIndex, _goal, _startTime, _stake),
+            makeCommitment(_activity, _measureIndex, _goal, _startTime, _stake),
             "SinglePlayerCommit::depositAndCommit - commitment failed"
         );
 
@@ -133,27 +138,33 @@ contract SinglePlayerCommit is Ownable {
     }
 
     function makeCommitment(
-        uint256 _activityIndex,
-        uint256 _measureIndex,
+        bytes32 _activity,
+        uint256 _measureIndex, // index of the Activity.measures array
         uint256 _goal,
         uint256 _startTime,
         uint256 _stake
     ) public returns (bool) {
         require(
-            commitments[msg.sender] != 0,
+            !commitments[msg.sender].exists,
             "SinglePlayerCommit::makeCommitment - msg.sender already has a commitment"
         );
         require(
-            allowedActivities[_activityIndex].exists,
-            "SinglePlayerCommit::makeCommitment - activityIndex does not exist"
+            allowedActivities[_activity].allowed,
+            "SinglePlayerCommit::makeCommitment - activity doesn't exist or isn't allowed"
         );
-        require(allowedMeasures[_measure].exists, "SinglePlayerCommit::makeCommitment - measureIndex does not exist");
+
+        bytes32 measure = allowedActivities[_activity].measures[_measureIndex];
+
+        require(
+            allowedMeasures[measure].allowed,
+            "SinglePlayerCommit::makeCommitment - measure doesn't exist or isn't allowed"
+        );
         require(
             _startTime > block.timestamp,
             "SinglePlayerCommit::makeCommitment - commitment cannot start in the past"
         );
 
-        uint256[] memory range = allowedActivities[_activityIndex].measures[_measureIndex];
+        uint256[2] storage range = allowedActivities[_activity].ranges[_measureIndex];
         require(_goal >= range[0], "SinglePlayerCommit::makeCommitment - goal is too low");
         require(_goal <= range[1], "SinglePlayerCommit::makeCommitment - goal is too high");
 
@@ -164,20 +175,29 @@ contract SinglePlayerCommit is Ownable {
         // create commitment...
         Commitment memory commitment = Commitment({
             committer: msg.sender,
-            activityIndex: _activityIndex,
-            measureIndex: _measureIndex,
+            activity: _activity,
+            measure: measure,
+            goalValue: _goal,
             start: _startTime,
             end: endTime,
             stake: _stake,
+            exists: true,
             reportedValue: 0,
             met: false
         });
 
         // ...and add it to storage
         commitments[msg.sender] = commitment;
-        committers.push(msg.sender);
+        // committers.push(msg.sender);
 
-        emit NewCommitment(msg.sender, _activityIndex, _measureIndex, _startTime, endTime, _stake);
+        emit NewCommitment(
+            msg.sender,
+            allowedActivities[_activity].name,
+            allowedMeasures[measure].name,
+            _startTime,
+            endTime,
+            _stake
+        );
 
         return true;
     }
@@ -207,19 +227,18 @@ contract SinglePlayerCommit is Ownable {
         Commitment memory commitment = commitments[committer];
 
         // check if commitment has ended
-        require(
-            commitment.endTime < block.timestamp,
-            "SinglePlayerCommit::processCommitment - commitment is still active"
-        );
+        require(commitment.end < block.timestamp, "SinglePlayerCommit::processCommitment - commitment is still active");
 
         bool met = commitment.met;
         uint256 stake = commitment.stake;
 
-        // delete the expired commitment // TODO: is this the right way?
-        commitments[committer] = 0;
+        // "delete" the expired commitment
+        commitments[committer].exists = false;
         // remove the committer from the list of committers
-        committers[committer] = committers[committers.length.sub(1)];
-        committers.pop();
+        // committers[committer] = committers[committers.length.sub(1)];
+        // committers.pop();
+
+        uint256 penalty;
 
         if (met) {
             penalty = 0;
@@ -232,16 +251,16 @@ contract SinglePlayerCommit is Ownable {
         emit CommitmentEnded(committer, met, penalty);
     }
 
-    function processCommitments() public returns (bool) {
-        for (uint256 i = 0; i < committers.length; i.add(1)) {
-            processCommitment(committers[i]);
-        }
+    // function processCommitments() public returns (bool) {
+    //     for (uint256 i = 0; i < committers.length; i.add(1)) {
+    //         processCommitment(committers[i]);
+    //     }
 
-        return true;
-    }
+    //     return true;
+    // }
 
     function ownerWithdraw(uint256 amount) public onlyOwner returns (bool) {
-        uint256 available = token.balance(address(this)).sub(committerBalance);
+        uint256 available = token.balanceOf(address(this)).sub(committerBalance);
 
         require(amount <= available, "SinglePlayerCommit::ownerWithdraw - not enough available balance");
 
@@ -252,33 +271,41 @@ contract SinglePlayerCommit is Ownable {
 
     // internal functions
 
-    function _addMeasure(string memory _name) internal returns (uint256 measureIndex) {
+    function _addMeasure(string memory _name) internal returns (bytes32 measureKey) {
         Measure memory measure = Measure({ name: _name, allowed: true });
-        uint256 measureIndex = allowedMeasures.length;
-        allowedMeasures.push(measure);
-        return measureIndex;
+
+        measureKey = keccak256(abi.encode(_name));
+        allowedMeasures[measureKey] = measure;
+        measureList.push(measureKey);
+
+        return measureKey;
     }
 
     function _addActivity(
         string memory _name,
-        uint256 _measureIndex,
-        uint256[] _range,
+        bytes32[] memory _measures,
+        uint256[2][] memory _ranges,
         address _oracle
-    ) internal returns (uint256 activityIndex) {
-        mapping(uint256 => uint256[]) memory activity_measures;
-        activity_measures[measureIndex] = _range;
+    ) internal returns (bytes32 activityKey) {
+        uint256 measuresLength = _measures.length;
+        require(
+            measuresLength == _ranges.length,
+            "SinglePlayerCommit::_addActivity - measures and ranges must have same length"
+        );
 
-        Activity memory activity = Activity({
-            name: _name,
-            measures: activity_measures,
-            oracle: _oracle,
-            allowed: true
-        });
+        Activity memory activity;
 
-        uint256 activityIndex = allowedMeasures.length;
-        allowedActivities.push(activity);
+        activity.name = _name;
+        activity.oracle = _oracle;
+        activity.measures = _measures;
+        activity.ranges = _ranges;
+        activity.allowed = true;
 
-        return activityIndex;
+        activityKey = keccak256(abi.encode(_name));
+        allowedActivities[activityKey] = activity;
+        activityList.push(activityKey);
+
+        return activityKey;
     }
 
     function _changeCommitterBalance(uint256 amount, bool add) internal returns (bool) {
