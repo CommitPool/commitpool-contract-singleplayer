@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT */
-pragma solidity ^0.6.9;
+pragma solidity ^0.6.10;
 pragma experimental ABIEncoderV2;
 
 import "@nomiclabs/buidler/console.sol";
@@ -89,10 +89,15 @@ contract SinglePlayerCommit is Ownable {
         // set up token interface
         token = IERC20(_token);
 
-        bytes32[] memory measureKeys;
+        // need to create fixed length bytes32 array to pass to _addActivity
+        uint256 len = _measures.length;
+        bytes32[] memory measureKeys = new bytes32[](len);
+
         // register measures
-        for (uint256 i = 0; i < _measures.length; i.add(1)) {
+        for (uint256 i = 0; i < len; i++) {
+            // register the measure
             bytes32 measureKey = _addMeasure(_measures[i]);
+            // add its key to the array to be passed to _addActivity
             measureKeys[i] = measureKey;
         }
 
@@ -103,7 +108,28 @@ contract SinglePlayerCommit is Ownable {
     // fallback function (if exists)
     // TODO
 
-    // public functions
+    // view functions
+
+    function getActivityName(bytes32 _activityKey) public view returns (string memory) {
+        return allowedActivities[_activityKey].name;
+    }
+
+    function getActivityMeasures(bytes32 _activityKey) public view returns (string[] memory measureNames) {
+        bytes32[] memory measures = allowedActivities[_activityKey].measures;
+        uint256 len = measures.length;
+        measureNames = new string[](len);
+        for (uint256 i = 0; i < len; i++) {
+            measureNames[i] = getMeasureName(measures[i]);
+        }
+
+        return measureNames;
+    }
+
+    function getMeasureName(bytes32 _measureKey) public view returns (string memory) {
+        return allowedMeasures[_measureKey].name;
+    }
+
+    // other public functions
     function depositAndCommit(
         bytes32 _activity,
         uint256 _measureIndex,
@@ -112,11 +138,11 @@ contract SinglePlayerCommit is Ownable {
         uint256 _stake,
         uint256 _depositAmount
     ) public returns (bool) {
-        require(deposit(_depositAmount), "SinglePlayerCommit::depositAndCommit - deposit failed");
+        require(deposit(_depositAmount), "SPC::depositAndCommit - deposit failed");
 
         require(
             makeCommitment(_activity, _measureIndex, _goal, _startTime, _stake),
-            "SinglePlayerCommit::depositAndCommit - commitment failed"
+            "SPC::depositAndCommit - commitment failed"
         );
 
         return true;
@@ -124,10 +150,7 @@ contract SinglePlayerCommit is Ownable {
 
     function deposit(uint256 amount) public returns (bool) {
         // make deposit
-        require(
-            token.transferFrom(msg.sender, address(this), amount),
-            "SinglePlayerCommit::deposit - token transfer failed"
-        );
+        require(token.transferFrom(msg.sender, address(this), amount), "SPC::deposit - token transfer failed");
 
         // update committer's balance
         _changeCommitterBalance(amount, true);
@@ -144,31 +167,19 @@ contract SinglePlayerCommit is Ownable {
         uint256 _startTime,
         uint256 _stake
     ) public returns (bool) {
-        require(
-            !commitments[msg.sender].exists,
-            "SinglePlayerCommit::makeCommitment - msg.sender already has a commitment"
-        );
-        require(
-            allowedActivities[_activity].allowed,
-            "SinglePlayerCommit::makeCommitment - activity doesn't exist or isn't allowed"
-        );
+        require(!commitments[msg.sender].exists, "SPC::makeCommitment - msg.sender already has a commitment");
+        require(allowedActivities[_activity].allowed, "SPC::makeCommitment - activity doesn't exist or isn't allowed");
 
         bytes32 measure = allowedActivities[_activity].measures[_measureIndex];
 
-        require(
-            allowedMeasures[measure].allowed,
-            "SinglePlayerCommit::makeCommitment - measure doesn't exist or isn't allowed"
-        );
-        require(
-            _startTime > block.timestamp,
-            "SinglePlayerCommit::makeCommitment - commitment cannot start in the past"
-        );
+        require(allowedMeasures[measure].allowed, "SPC::makeCommitment - measure doesn't exist or isn't allowed");
+        require(_startTime > block.timestamp, "SPC::makeCommitment - commitment cannot start in the past");
 
         uint256[2] storage range = allowedActivities[_activity].ranges[_measureIndex];
-        require(_goal >= range[0], "SinglePlayerCommit::makeCommitment - goal is too low");
-        require(_goal <= range[1], "SinglePlayerCommit::makeCommitment - goal is too high");
+        require(_goal >= range[0], "SPC::makeCommitment - goal is too low");
+        require(_goal <= range[1], "SPC::makeCommitment - goal is too high");
 
-        require(balances[msg.sender] >= _stake, "SinglePlayerCommit::makeCommitment - insufficient token balance");
+        require(balances[msg.sender] >= _stake, "SPC::makeCommitment - insufficient token balance");
 
         uint256 endTime = _startTime.add(7 days);
 
@@ -204,12 +215,12 @@ contract SinglePlayerCommit is Ownable {
 
     function withdraw(uint256 amount) public returns (bool) {
         uint256 available = balances[msg.sender].sub(commitments[msg.sender].stake);
-        require(amount >= available, "SinglePlayerCommit::withdraw - not enough balance available");
+        require(amount >= available, "SPC::withdraw - not enough balance available");
 
         // remove from committer's balance
         _changeCommitterBalance(amount, false);
 
-        require(token.transfer(msg.sender, amount), "SinglePlayerCommit::withdraw - token transfer failed");
+        require(token.transfer(msg.sender, amount), "SPC::withdraw - token transfer failed");
 
         emit Withdrawal(msg.sender, amount);
 
@@ -227,7 +238,7 @@ contract SinglePlayerCommit is Ownable {
         Commitment memory commitment = commitments[committer];
 
         // check if commitment has ended
-        require(commitment.end < block.timestamp, "SinglePlayerCommit::processCommitment - commitment is still active");
+        require(commitment.end < block.timestamp, "SPC::processCommitment - commitment is still active");
 
         bool met = commitment.met;
         uint256 stake = commitment.stake;
@@ -262,9 +273,9 @@ contract SinglePlayerCommit is Ownable {
     function ownerWithdraw(uint256 amount) public onlyOwner returns (bool) {
         uint256 available = token.balanceOf(address(this)).sub(committerBalance);
 
-        require(amount <= available, "SinglePlayerCommit::ownerWithdraw - not enough available balance");
+        require(amount <= available, "SPC::ownerWithdraw - not enough available balance");
 
-        require(token.transfer(msg.sender, amount), "SinglePlayerCommit::ownerWithdraw - token transfer failed");
+        require(token.transfer(msg.sender, amount), "SPC::ownerWithdraw - token transfer failed");
 
         return true;
     }
@@ -288,10 +299,7 @@ contract SinglePlayerCommit is Ownable {
         address _oracle
     ) internal returns (bytes32 activityKey) {
         uint256 measuresLength = _measures.length;
-        require(
-            measuresLength == _ranges.length,
-            "SinglePlayerCommit::_addActivity - measures and ranges must have same length"
-        );
+        require(measuresLength == _ranges.length, "SPC::_addActivity - measures and ranges must have same length");
 
         Activity memory activity;
 
