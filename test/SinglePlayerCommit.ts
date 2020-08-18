@@ -7,7 +7,7 @@ import chainLinkArtifact from "./resources/ChainLink.json";
 
 import { SinglePlayerCommit } from "../typechain/SinglePlayerCommit";
 import { BigNumberish } from "ethers";
-import { shouldDeployWithInitialParameters } from "./SinglePlayerCommit.behavior";
+import { shouldDeployWithInitialParameters, shouldAllowUserToMakeCommitment, shouldSettleCompletedCommitment } from "./SinglePlayerCommit.behavior";
 
 chai.use(solidity);
 
@@ -35,8 +35,18 @@ setTimeout(async function () {
       ])) as SinglePlayerCommit;
     });
 
-    describe("deployment was succesful", function () {
+    describe("Deployment was succesful if contract", function () {
       shouldDeployWithInitialParameters(activity, measures);
+    });
+
+    //TODO User can manage commitments
+    describe("User can", function() {
+      shouldAllowUserToMakeCommitment(activity, measures);
+    });
+
+    //TODO Contract pays out stake upon completion
+    describe("Contract can", function() {
+      shouldSettleCompletedCommitment(activity, measures);
     });
   });
 

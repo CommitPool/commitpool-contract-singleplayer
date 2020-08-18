@@ -26,3 +26,23 @@ export function shouldDeployWithInitialParameters(activity: string, measures: st
     expect(await this.singlePlayerCommit.getMeasureName(measureKey)).to.equal(measures[0]);
   });
 }
+
+
+export function shouldAllowUserToMakeCommitment(activity: string, measures: string[]): void {
+  it.skip("create commitment", async function () {
+    const activityKey: BytesLike = await this.singlePlayerCommit.activityList(0);
+
+    expect(await this.singlePlayerCommit.getActivityName(activityKey)).to.equal(activity);
+
+  })
+}
+
+
+export function shouldSettleCompletedCommitment(activity: string, measures: string[]): void {
+  it.skip("payout when completing commitment", async function () {
+    const activityKey: BytesLike = await this.singlePlayerCommit.activityList(0);
+
+    expect(await this.singlePlayerCommit.getActivityName(activityKey)).to.equal(activity);
+
+  })
+}
