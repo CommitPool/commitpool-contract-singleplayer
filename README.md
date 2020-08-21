@@ -4,7 +4,7 @@ CommitPool helps people meet their personal goals by holding themselves accounta
 
 Our MVP focuses on a single goal type for individuals, hence the Single Player mode.
 
-#### Getting started
+## Getting started
 
 Currently Ganache and Node 14 are not playing well together. To get started:
 
@@ -13,7 +13,7 @@ Currently Ganache and Node 14 are not playing well together. To get started:
 3. ```npm run-script build```
 4. ```npm test``` (to verify the build)
 
-#### Features
+## Features
 
 Single Player mode features:
 
@@ -21,27 +21,26 @@ Single Player mode features:
 - [ ] Management of commitment activities
 - [ ] Management of activity measures
 - [ ] Execution of commitment settlement
-- [ ] 
 
-##### Creation of Commitment
+#### Creation of Commitment
 
 A commitment consists of an activity, a measure for given activity, a starting time, and stake. We will set the end date 7 days after the startdate.
 
-##### Management of commitment activities
+#### Management of commitment activities
 
-##### Management of activity measures
+#### Management of activity measures
 
-##### Execution of commitment settlement
+#### Execution of commitment settlement
 
-#### Architecture
+## Architecture
 
-![Architecture diagram of CommitPool](/documentation/architecture.png "Architecture diagram" =250x)
+![Architecture diagram of CommitPool](/documentation/architecture.png "Architecture diagram")
 
-#### Stack
+## Stack
 
 This repository is a fork from [Paul Berg's Solidity Template](https://github.com/PaulRBerg/solidity-template)
 
-#### Get in touch
+## Get in touch
 
 <commitpool@gmail.com>
 
