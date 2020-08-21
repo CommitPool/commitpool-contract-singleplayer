@@ -24,7 +24,7 @@ Single Player mode features:
 
 #### Creation of Commitment
 
-A commitment consists of an activity, a measure for given activity, a starting time, and stake. We will set the end date 7 days after the startdate.
+A commitment consists of an ```activity```, an ```activity measure``` for given activity, a ```start time```, and ```stake```. We will set the ```end date``` 7 days after the startdate.
 
 #### Management of commitment activities
 
