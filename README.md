@@ -17,20 +17,30 @@ Currently Ganache and Node 14 are not playing well together. To get started:
 
 Single Player mode features:
 
-- [x] Creation of commitments
-- [ ] Management of commitment activities
-- [ ] Management of activity measures
-- [ ] Execution of commitment settlement
+- [x] Creation of Commitment
+- [ ] Management of Activities
+- [ ] Management of Measures
+- [x] Execution of commitment settlement
 
 #### Creation of Commitment
 
-A commitment consists of an ```activity```, an ```activity measure``` for given activity, a ```start time```, and ```stake```. We will set the ```end date``` 7 days after the startdate.
+A commitment consists of an ```activity```, a ```measure``` for given activity, a ```start time```, and ```stake```. We will set the ```end date``` 7 days after the startdate.
 
-#### Management of commitment activities
+#### Management of Activities
 
-#### Management of activity measures
+An activity consists of a ```name```, a ```measure``` to express activity metrics, an array of accepted ```ranges```, and the ```oracle``` address. Activities can be enabled by setting it to ```allowed```.
+
+For the Single Player mode ```biking``` is the only available activity, as declared in ```scripts/deploy.ts```
+
+#### Management of Measures
+
+A measure has a ```name``` and can be enabled by setting it to ```allowed```.
+
+For the Single Player mode ```km``` is the only available measure, as declared in ```scripts/deploy.ts```
 
 #### Execution of commitment settlement
+
+The contract can be called to process the commitment based on the address of the committer. A check on time and completion determines whether the stake is returned to the committer.
 
 ## Architecture
 
