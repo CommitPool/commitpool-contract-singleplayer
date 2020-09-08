@@ -6,14 +6,17 @@ import "@nomiclabs/buidler/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@opengsn/gsn/contracts/BaseRelayRecipient.sol";
+import "@opengsn/gsn/contracts/interfaces/IKnowForwarderAddress.sol";
 
-contract SinglePlayerCommit is Ownable {
+contract SinglePlayerCommit is Ownable, BaseRelayRecipient, BaseRelayRecipient {
     using SafeMath for uint256;
 
     /******************
     GLOBAL CONSTANTS
     ******************/
     IERC20 public token;
+    address public trustedForwarder;
     uint256 BIGGEST_NUMBER = uint256(-1);
 
     /***************
@@ -84,8 +87,10 @@ contract SinglePlayerCommit is Ownable {
         string[] memory _measures,
         uint256[2][] memory _ranges,
         address _oracle,
-        address _token
+        address _token,
+        address _forwarder // GSN relayer, e.g. from https://docs.opengsn.org/gsn-provider/networks.html
     ) public {
+        trustedForwarder = _forwarder;
         // set up token interface
         token = IERC20(_token);
 
@@ -129,6 +134,15 @@ contract SinglePlayerCommit is Ownable {
         return allowedMeasures[_measureKey].name;
     }
 
+    // Gas Station Network public functions
+    function versionRecipient() external virtual override view returns (string memory) {
+        return "1.0";
+    }
+
+    function getTrustedForwarder() public override view returns (address) {
+        return trustedForwarder;
+    }
+
     // other public functions
     function depositAndCommit(
         bytes32 _activity,
@@ -150,12 +164,12 @@ contract SinglePlayerCommit is Ownable {
 
     function deposit(uint256 amount) public returns (bool) {
         // make deposit
-        require(token.transferFrom(msg.sender, address(this), amount), "SPC::deposit - token transfer failed");
+        require(token.transferFrom(_msgSender(), address(this), amount), "SPC::deposit - token transfer failed");
 
         // update committer's balance
         _changeCommitterBalance(amount, true);
 
-        emit Deposit(msg.sender, amount);
+        emit Deposit(_msgSender(), amount);
 
         return true;
     }
@@ -167,7 +181,8 @@ contract SinglePlayerCommit is Ownable {
         uint256 _startTime,
         uint256 _stake
     ) public returns (bool) {
-        require(!commitments[msg.sender].exists, "SPC::makeCommitment - msg.sender already has a commitment");
+        address sender = _msgSender();
+        require(!commitments[sender].exists, "SPC::makeCommitment - msg.sender already has a commitment");
         require(allowedActivities[_activity].allowed, "SPC::makeCommitment - activity doesn't exist or isn't allowed");
 
         bytes32 measure = allowedActivities[_activity].measures[_measureIndex];
@@ -179,13 +194,13 @@ contract SinglePlayerCommit is Ownable {
         require(_goal >= range[0], "SPC::makeCommitment - goal is too low");
         require(_goal <= range[1], "SPC::makeCommitment - goal is too high");
 
-        require(balances[msg.sender] >= _stake, "SPC::makeCommitment - insufficient token balance");
+        require(balances[sender] >= _stake, "SPC::makeCommitment - insufficient token balance");
 
         uint256 endTime = _startTime.add(7 days);
 
         // create commitment...
         Commitment memory commitment = Commitment({
-            committer: msg.sender,
+            committer: sender,
             activity: _activity,
             measure: measure,
             goalValue: _goal,
@@ -198,11 +213,11 @@ contract SinglePlayerCommit is Ownable {
         });
 
         // ...and add it to storage
-        commitments[msg.sender] = commitment;
-        // committers.push(msg.sender);
+        commitments[sender] = commitment;
+        // committers.push(sender);
 
         emit NewCommitment(
-            msg.sender,
+            sender,
             allowedActivities[_activity].name,
             allowedMeasures[measure].name,
             _startTime,
@@ -214,15 +229,16 @@ contract SinglePlayerCommit is Ownable {
     }
 
     function withdraw(uint256 amount) public returns (bool) {
-        uint256 available = balances[msg.sender].sub(commitments[msg.sender].stake);
+        address sender = _msgSender();
+        uint256 available = balances[sender].sub(commitments[sender].stake);
         require(amount >= available, "SPC::withdraw - not enough balance available");
 
         // remove from committer's balance
         _changeCommitterBalance(amount, false);
 
-        require(token.transfer(msg.sender, amount), "SPC::withdraw - token transfer failed");
+        require(token.transfer(sender, amount), "SPC::withdraw - token transfer failed");
 
-        emit Withdrawal(msg.sender, amount);
+        emit Withdrawal(sender, amount);
 
         return true;
     }
@@ -275,7 +291,7 @@ contract SinglePlayerCommit is Ownable {
 
         require(amount <= available, "SPC::ownerWithdraw - not enough available balance");
 
-        require(token.transfer(msg.sender, amount), "SPC::ownerWithdraw - token transfer failed");
+        require(token.transfer(_msgSender(), amount), "SPC::ownerWithdraw - token transfer failed");
 
         return true;
     }
@@ -317,14 +333,16 @@ contract SinglePlayerCommit is Ownable {
     }
 
     function _changeCommitterBalance(uint256 amount, bool add) internal returns (bool) {
+        address sender = _msgSender();
+
         if (add) {
             // increase committer's token balance
-            balances[msg.sender] = balances[msg.sender].add(amount);
+            balances[sender] = balances[sender].add(amount);
             // add to total committer balance sum
             committerBalance = committerBalance.add(amount);
         } else {
             // decrease committer's token balance
-            balances[msg.sender] = balances[msg.sender].sub(amount);
+            balances[sender] = balances[sender].sub(amount);
             // decrease total committer balance sum
             committerBalance = committerBalance.sub(amount);
         }
