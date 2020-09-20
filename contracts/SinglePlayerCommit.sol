@@ -24,6 +24,7 @@ contract SinglePlayerCommit is Ownable {
         bool allowed;
     }
 
+    //TODO Activity deployed in test now only has name/oracle/allowed initialized 
     struct Activity {
         string name; // e.g. "cycling"
         bytes32[] measures; // keys from allowedMeasures

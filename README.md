@@ -55,6 +55,3 @@ This repository is a fork from [Paul Berg's Solidity Template](https://github.co
 <commitpool@gmail.com>
 
 Subscribe to our [Substack](https://commit.substack.com/)
-
-
-

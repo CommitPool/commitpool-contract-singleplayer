@@ -7,15 +7,16 @@ import chainLinkArtifact from "./resources/ChainLink.json";
 
 import { SinglePlayerCommit } from "../typechain/SinglePlayerCommit";
 import { BigNumberish } from "ethers";
-import { shouldDeployWithInitialParameters, shouldAllowUserToMakeCommitment, shouldSettleCompletedCommitment } from "./SinglePlayerCommit.behavior";
+import { shouldDeployWithInitialParameters } from "./SinglePlayerCommit.deploy";
+import { shouldManageCommitments } from './SinglePlayerCommit.commitment';
 
 chai.use(solidity);
 
 setTimeout(async function () {
-  const provider = new MockProvider();
-  const [wallet] = provider.getWallets();
+  const [wallet, walletTo] = new MockProvider().getWallets();
 
   describe("SinglePlayerCommit contract", function () {
+
     const activity: string = "biking";
     const measures: string[] = ["km"];
     const ranges: BigNumberish[][] = [[2, 1024]];
@@ -36,17 +37,11 @@ setTimeout(async function () {
     });
 
     describe("Deployment was succesful if contract", function () {
-      shouldDeployWithInitialParameters(activity, measures);
+      shouldDeployWithInitialParameters();
     });
 
-    //TODO User can manage commitments
-    describe("User can", function() {
-      shouldAllowUserToMakeCommitment(activity, measures);
-    });
-
-    //TODO Contract pays out stake upon completion
-    describe("Contract can", function() {
-      shouldSettleCompletedCommitment(activity, measures);
+    describe("Commitments can be managed", function() {
+      shouldManageCommitments(wallet, walletTo);
     });
   });
 
