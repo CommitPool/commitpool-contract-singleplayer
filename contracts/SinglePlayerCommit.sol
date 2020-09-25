@@ -7,6 +7,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+//TODO Activity deployed in test now only has name/oracle/allowed initialized 
+//TODO Do we want console.log logging by buidler? Which level?
+
 contract SinglePlayerCommit is Ownable {
     using SafeMath for uint256;
 
@@ -24,7 +27,6 @@ contract SinglePlayerCommit is Ownable {
         bool allowed;
     }
 
-    //TODO Activity deployed in test now only has name/oracle/allowed initialized 
     struct Activity {
         string name; // e.g. "cycling"
         bytes32[] measures; // keys from allowedMeasures

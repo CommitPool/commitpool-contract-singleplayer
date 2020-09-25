@@ -1,6 +1,10 @@
 import { expect } from "chai";
 import { BytesLike } from "ethers/lib/utils";
-import { SinglePlayerCommit } from "../typechain/SinglePlayerCommit";
+
+//TODO Need provider that has a state/memory for check on contract calls (function().to.be.calledOnContract()). Like the one from Waffle?
+//Example expect('_deposit').to.be.calledOnContract(this.singlePlayerCommit);
+//TODO Now expecting VM Runtime 'invalid opcode' error. 
+// Should/can this be prevented in contract while using dynamic arrays? Look at revert()
 
 export function shouldDeployWithInitialParameters(): void {
 
@@ -16,11 +20,9 @@ export function shouldDeployWithInitialParameters(): void {
     // expect(_activity['ranges']).to.equal([2,1024]);
     expect(_activity['oracle']).to.be.properAddress;
     expect(_activity['allowed']).to.be.true;
-    expect('getActivityName').to.be.calledOnContract(this.singlePlayerCommit);
+    // expect('getActivityName').to.be.calledOnContract(this.singlePlayerCommit);
   });
 
-  //TODO Now expecting VM Runtime 'invalid opcode' error. 
-  // Should/can this be prevented in contract while using dynamic arrays?
   it("has no other activities", async function () {
     let error;
     try{
@@ -28,8 +30,7 @@ export function shouldDeployWithInitialParameters(): void {
     } catch(err) {
       error = err;
     } finally {
-      expect('activityList').to.be.calledOnContract(this.singlePlayerCommit);
-      expect(error.results[error.hashes[0]]['error']).to.equal('invalid opcode');
+      expect(error.message).to.equal('Transaction reverted without a reason');
     }
   });
 
@@ -49,8 +50,7 @@ export function shouldDeployWithInitialParameters(): void {
     } catch(err) {
       error = err;
     } finally {
-      expect('measureList').to.be.calledOnContract(this.singlePlayerCommit);
-      expect(error.results[error.hashes[0]]['error']).to.equal('invalid opcode');
+      expect(error.message).to.equal('Transaction reverted without a reason');
     }
   });
 

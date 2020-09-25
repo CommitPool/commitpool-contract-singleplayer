@@ -9,6 +9,7 @@ import "./tasks/clean";
 import "./tasks/typechain";
 
 usePlugin("@nomiclabs/buidler-waffle");
+usePlugin("@nomiclabs/buidler-ethers");
 usePlugin("solidity-coverage");
 
 interface HDAccountsConfigExtended extends HDAccountsConfig {
