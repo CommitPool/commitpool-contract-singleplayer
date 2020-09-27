@@ -239,6 +239,7 @@ contract SinglePlayerCommit is Ownable {
     }
 
     function processCommitment(address committer) public {
+        console.log("Processing commitment");
         Commitment memory commitment = commitments[committer];
 
         // check if commitment has ended
