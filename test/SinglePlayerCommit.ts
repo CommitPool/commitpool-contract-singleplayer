@@ -1,8 +1,8 @@
 //Setup
 import chai from "chai";
 import { ethers } from "@nomiclabs/buidler";
-import { BigNumberish, Signer, ContractFactory } from "ethers";
-import { deployMockContract, MockContract, solidity } from "ethereum-waffle";
+import { BigNumberish, Signer, ContractFactory, Wallet } from "ethers";
+import { createFixtureLoader, deployMockContract, loadFixture, MockContract, MockProvider, solidity } from "ethereum-waffle";
 
 //Artifacts
 import { SinglePlayerCommit } from "../typechain/SinglePlayerCommit";
@@ -11,7 +11,8 @@ import chainLinkArtifact from "./resources/ChainLink.json";
 
 //Test suites
 import { shouldDeployWithInitialParameters } from "./SinglePlayerCommit.deploy";
-import { shouldManageCommitments } from "./SinglePlayerCommit.commitment";
+import { userCanManageCommitments } from "./SinglePlayerCommit.user";
+import { ownerCanManageContract } from "./SinglePlayerCommit.owner";
 
 chai.use(solidity);
 
@@ -19,21 +20,20 @@ setTimeout(async function () {
   describe("SinglePlayerCommit contract", async function () {
     let accounts: Signer[];
     let owner: Signer;
+
     const activity: string = "biking";
     const measures: string[] = ["km"];
     const ranges: BigNumberish[][] = [[2, 1024]];
 
     before(async function () {
-      console.log("Getting accounts");
+      console.log("Setting up environment [provider, signers, mock contracts]")
+      ethers.provider = new MockProvider();
       accounts = await ethers.getSigners();
       owner = accounts[0];
-      console.log("Owner set to ", await owner.getAddress());
-
-      console.log("Setting up mock objects for ChainLink and DAI");
       this.oracle = await deployMockContract(owner, chainLinkArtifact) as MockContract;
       this.token = await deployMockContract(owner, daiArtifact) as MockContract;
 
-      console.log("Deploying SPCommit with %s, %s, and %s", activity, measures, ranges[0]);
+      console.log("Deploying SinglePlayerCommit with %s, %s, and %s", activity, measures, ranges[0]);
       const SinglePlayerCommit: ContractFactory = await ethers.getContractFactory("SinglePlayerCommit");
 
       this.singlePlayerCommit = (await SinglePlayerCommit.deploy(
@@ -45,7 +45,7 @@ setTimeout(async function () {
       )) as SinglePlayerCommit;
       await this.singlePlayerCommit.deployed();
 
-      console.log("SinglePlayerCommit contract deployed to ", this.singlePlayerCommit.address);
+      console.log("SinglePlayerCommit deployed to ", this.singlePlayerCommit.address);
 
     });
 
@@ -53,8 +53,9 @@ setTimeout(async function () {
       shouldDeployWithInitialParameters();
     });
 
-    describe("Commitments can be managed", function () {
-      shouldManageCommitments();
+    describe("Contract interactions", function () {
+      ownerCanManageContract();
+      userCanManageCommitments();
     });
   });
 

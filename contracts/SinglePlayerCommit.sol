@@ -7,8 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-//TODO Activity deployed in test now only has name/oracle/allowed initialized 
-//TODO Do we want console.log logging by buidler? Which level?
+//TODO Do we want console.log logging, start with Activity constructor?..
 
 contract SinglePlayerCommit is Ownable {
     using SafeMath for uint256;
@@ -152,6 +151,7 @@ contract SinglePlayerCommit is Ownable {
     }
 
     function deposit(uint256 amount) public returns (bool) {
+        console.log("Received call for depositing drawing amount %s from sender %s", amount, msg.sender);
         // make deposit
         require(token.transferFrom(msg.sender, address(this), amount), "SPC::deposit - token transfer failed");
 
@@ -217,6 +217,7 @@ contract SinglePlayerCommit is Ownable {
     }
 
     function withdraw(uint256 amount) public returns (bool) {
+        console.log("Received call for withdrawing amount %s from sender %s", amount, msg.sender);
         uint256 available = balances[msg.sender].sub(commitments[msg.sender].stake);
         require(amount >= available, "SPC::withdraw - not enough balance available");
 
