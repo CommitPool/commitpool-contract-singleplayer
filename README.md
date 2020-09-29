@@ -1,6 +1,7 @@
 ##  CommitPool Single Player Smart Contract repository
 
-CommitPool helps people meet their personal goals by holding themselves accountable. CommitPool users stake money to credibly commit to meeting their goals, and lose their stake when they don’t.
+
+[CommitPool](http://commitpool.com/) helps people meet their personal goals by holding themselves accountable. CommitPool users stake money to credibly commit to meeting their goals, and lose their stake when they don’t.
 
 Our MVP focuses on a single goal type for individuals, hence the Single Player mode.
 
@@ -52,7 +53,7 @@ This repository is a fork from [Paul Berg's Solidity Template](https://github.co
 
 ## Get in touch
 
-[commitpool.com](www.commitpool.com)
+[commitpool.com](http://commitpool.com/)
 
 <commitpool@gmail.com>
 
