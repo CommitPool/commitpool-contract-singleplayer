@@ -1,8 +1,8 @@
 //Setup
 import chai from "chai";
 import { ethers } from "@nomiclabs/buidler";
-import { BigNumberish, Signer, ContractFactory, Wallet } from "ethers";
-import { createFixtureLoader, deployMockContract, loadFixture, MockContract, MockProvider, solidity } from "ethereum-waffle";
+import { BigNumberish, Signer, ContractFactory} from "ethers";
+import { deployMockContract, MockContract, MockProvider, solidity } from "ethereum-waffle";
 
 //Artifacts
 import { SinglePlayerCommit } from "../typechain/SinglePlayerCommit";
@@ -15,6 +15,7 @@ import { userCanManageCommitments } from "./SinglePlayerCommit.user";
 import { ownerCanManageContract } from "./SinglePlayerCommit.owner";
 
 chai.use(solidity);
+const bre = require("@nomiclabs/buidler");
 
 setTimeout(async function () {
   describe("SinglePlayerCommit contract", async function () {

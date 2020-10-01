@@ -88,6 +88,7 @@ contract SinglePlayerCommit is Ownable {
         address _oracle,
         address _token
     ) public {
+        console.log("Constructor called");
         // set up token interface
         token = IERC20(_token);
 
@@ -170,8 +171,11 @@ contract SinglePlayerCommit is Ownable {
         uint256 _startTime,
         uint256 _stake
     ) public returns (bool) {
+        console.log("makeCommitment called");
+
         require(!commitments[msg.sender].exists, "SPC::makeCommitment - msg.sender already has a commitment");
         require(allowedActivities[_activity].allowed, "SPC::makeCommitment - activity doesn't exist or isn't allowed");
+        require(allowedActivities[_activity].measures.length >= _measureIndex+1, "SPC::makeCommitment - measure index out of bounds");
 
         bytes32 measure = allowedActivities[_activity].measures[_measureIndex];
 

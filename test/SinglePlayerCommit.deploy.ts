@@ -6,6 +6,7 @@ export function shouldDeployWithInitialParameters(): void {
   it("has the 'biking' activity and it is allowed", async function () {
     const activityKey: BytesLike = await this.singlePlayerCommit.activityList(0);
     const _activityName: string = await this.singlePlayerCommit.getActivityName(activityKey);
+ 
 
     const _activity = await this.singlePlayerCommit.allowedActivities(activityKey);
 

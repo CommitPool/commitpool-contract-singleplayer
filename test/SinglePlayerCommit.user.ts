@@ -108,21 +108,19 @@ export function userCanManageCommitments(): void {
       const _amountToStake: BigNumber = utils.parseEther("50.0");
 
       //Activity
-      //TODO improve to revertedWith; now returns invalid opcode instead of error message
-      _activity = 'LALALA';
+      _activity = '0xb16dfc4a050ca7e77c1c5f443dc473a2f03ac722e25f721ab6333875f44984f2';
 
       await expect(
         contractWithUser.makeCommitment(_activity, _measureIndex, _goal, _startTime, _amountToStake, _overrides),
-      ).to.be.reverted;
+      ).to.be.revertedWith("SPC::makeCommitment - activity doesn't exist or isn't allowed");
       _activity = await this.singlePlayerCommit.activityList(0);
 
       //Measure
-      //TODO improve to revertedWith; now returns invalid opcode instead of error message
       _measureIndex = 1;
 
       await expect(
         contractWithUser.makeCommitment(_activity, _measureIndex, _goal, _startTime, _amountToStake, _overrides),
-      ).to.be.reverted;
+      ).to.be.revertedWith("SPC::makeCommitment - measure index out of bounds");
       _measureIndex = 0;
 
       //Goal
