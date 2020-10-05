@@ -1,8 +1,6 @@
 //Setup
-import chai from "chai";
 import { ethers } from "@nomiclabs/buidler";
 import { BigNumberish, Signer, ContractFactory} from "ethers";
-import { deployMockContract, MockContract, MockProvider, solidity } from "ethereum-waffle";
 
 //Artifacts
 import { SinglePlayerCommit } from "../typechain/SinglePlayerCommit";
@@ -14,8 +12,8 @@ import { shouldDeployWithInitialParameters } from "./SinglePlayerCommit.deploy";
 import { userCanManageCommitments } from "./SinglePlayerCommit.user";
 import { ownerCanManageContract } from "./SinglePlayerCommit.owner";
 
-chai.use(solidity);
-const bre = require("@nomiclabs/buidler");
+import bre from "@nomiclabs/buidler";
+const waffle = bre.waffle;
 
 setTimeout(async function () {
   describe("SinglePlayerCommit contract", async function () {
@@ -28,11 +26,11 @@ setTimeout(async function () {
 
     before(async function () {
       console.log("Setting up environment [provider, signers, mock contracts]")
-      ethers.provider = new MockProvider();
+      // ethers.provider = new MockProvider();
       accounts = await ethers.getSigners();
       owner = accounts[0];
-      this.oracle = await deployMockContract(owner, chainLinkArtifact) as MockContract;
-      this.token = await deployMockContract(owner, daiArtifact) as MockContract;
+      this.oracle = await waffle.deployMockContract(owner, chainLinkArtifact);
+      this.token = await waffle.deployMockContract(owner, daiArtifact);
 
       console.log("Deploying SinglePlayerCommit with %s, %s, and %s", activity, measures, ranges[0]);
       const SinglePlayerCommit: ContractFactory = await ethers.getContractFactory("SinglePlayerCommit");
