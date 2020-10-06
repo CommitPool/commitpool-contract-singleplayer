@@ -46,6 +46,7 @@ const config: BuidlerConfig = {
   },
   networks: {
     buidlerevm: {
+      // loggingEnabled: true,
       chainId: 31337,
     },
     coverage: {

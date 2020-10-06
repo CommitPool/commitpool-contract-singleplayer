@@ -6,6 +6,7 @@ export function shouldDeployWithInitialParameters(): void {
   it("has the 'biking' activity and it is allowed", async function () {
     const activityKey: BytesLike = await this.singlePlayerCommit.activityList(0);
     const _activityName: string = await this.singlePlayerCommit.getActivityName(activityKey);
+ 
 
     const _activity = await this.singlePlayerCommit.allowedActivities(activityKey);
 
@@ -15,19 +16,14 @@ export function shouldDeployWithInitialParameters(): void {
     // expect(_activity['ranges']).to.equal([2,1024]);
     expect(_activity['oracle']).to.be.properAddress;
     expect(_activity['allowed']).to.be.true;
-    expect('getActivityName').to.be.calledOnContract(this.singlePlayerCommit);
+    // expect('getActivityName').to.be.calledOnContract(this.singlePlayerCommit);
   });
 
   it("has no other activities", async function () {
-    let error;
-    try{
-      await this.singlePlayerCommit.activityList(1)
-    } catch(err) {
-      error = err;
-    } finally {
-      expect('getActivityName').to.be.calledOnContract(this.singlePlayerCommit);
-      expect(error.results[error.hashes[0]].error).to.equal('invalid opcode');
-    }
+    await expect(
+      this.singlePlayerCommit.activityList(1),
+    ).to.be.revertedWith("Transaction reverted without a reason")
+    
   });
 
   it("has the 'km' measure and it is allowed", async function () {
@@ -40,14 +36,9 @@ export function shouldDeployWithInitialParameters(): void {
   });
 
   it("has no other measures", async function () {
-    let error;
-    try{
-      await this.singlePlayerCommit.measureList(1)
-    } catch(err) {
-      error = err;
-    } finally {
-      expect(error.results[error.hashes[0]].error).to.equal('invalid opcode');
-    }
+    await expect(
+      this.singlePlayerCommit.activityList(1),
+    ).to.be.revertedWith("Transaction reverted without a reason")
   });
 
 }
