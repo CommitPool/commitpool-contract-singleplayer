@@ -34,6 +34,7 @@ contract SinglePlayerCommit is Ownable {
         uint256 stake; // amount of token staked, scaled by token decimals
         bool exists; // flag to help check if commitment exists
         uint256 reportedValue; // as reported by oracle
+        bool timed; //if true, take time from API. if false, use default (distance)
         bool met; // whether the commitment has been met
     }
 
@@ -44,6 +45,7 @@ contract SinglePlayerCommit is Ownable {
         address committer,
         string activityName,
         uint256 goal,
+        bool timed,
         uint256 startTime,
         uint256 endTime,
         uint256 stake
@@ -92,12 +94,13 @@ contract SinglePlayerCommit is Ownable {
     function depositAndCommit(
         bytes32 _activityKey,
         uint256 _goal,
+        bool _timed,
         uint256 _startTime,
         uint256 _stake,
         uint256 _depositAmount
     ) public returns (bool) {
         require(deposit(_depositAmount), "SPC::depositAndCommit - deposit failed");
-        require(makeCommitment(_activityKey, _goal, _startTime, _stake), "SPC::depositAndCommit - commitment failed");
+        require(makeCommitment(_activityKey, _goal, _timed, _startTime, _stake), "SPC::depositAndCommit - commitment failed");
 
         return true;
     }
@@ -119,6 +122,7 @@ contract SinglePlayerCommit is Ownable {
         bytes32 _activityKey,
         // uint256 _measureIndex, // index of the Activity.measures array
         uint256 _goal,
+        bool _timed,
         uint256 _startTime,
         uint256 _stake
     ) public returns (bool) {
@@ -140,6 +144,7 @@ contract SinglePlayerCommit is Ownable {
             committer: msg.sender,
             activityKey: _activityKey,
             goal: _goal,
+            timed: _timed,
             startTime: _startTime,
             endTime: endTime,
             stake: _stake,
@@ -151,7 +156,7 @@ contract SinglePlayerCommit is Ownable {
         // ...and add it to storage
         commitments[msg.sender] = commitment;
 
-        emit NewCommitment(msg.sender, allowedActivities[_activityKey].name, _goal, _startTime, endTime, _stake);
+        emit NewCommitment(msg.sender, allowedActivities[_activityKey].name, _goal, _timed, _startTime, endTime, _stake);
 
         return true;
     }
