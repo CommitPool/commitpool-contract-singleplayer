@@ -28,13 +28,12 @@ contract SinglePlayerCommit is Ownable {
     struct Commitment {
         address committer; // user
         bytes32 activityKey;
-        uint256 goal;
+        uint256 goalValue;
         uint256 startTime;
         uint256 endTime;
         uint256 stake; // amount of token staked, scaled by token decimals
         bool exists; // flag to help check if commitment exists
         uint256 reportedValue; // as reported by oracle
-        bool timed; //if true, take time from API. if false, use default (distance)
         bool met; // whether the commitment has been met
     }
 
@@ -44,8 +43,7 @@ contract SinglePlayerCommit is Ownable {
     event NewCommitment(
         address committer,
         string activityName,
-        uint256 goal,
-        bool timed,
+        uint256 goalValue,
         uint256 startTime,
         uint256 endTime,
         uint256 stake
@@ -93,14 +91,13 @@ contract SinglePlayerCommit is Ownable {
     // other public functions
     function depositAndCommit(
         bytes32 _activityKey,
-        uint256 _goal,
-        bool _timed,
+        uint256 _goalValue,
         uint256 _startTime,
         uint256 _stake,
         uint256 _depositAmount
     ) public returns (bool) {
         require(deposit(_depositAmount), "SPC::depositAndCommit - deposit failed");
-        require(makeCommitment(_activityKey, _goal, _timed, _startTime, _stake), "SPC::depositAndCommit - commitment failed");
+        require(makeCommitment(_activityKey, _goalValue, _startTime, _stake), "SPC::depositAndCommit - commitment failed");
 
         return true;
     }
@@ -120,9 +117,7 @@ contract SinglePlayerCommit is Ownable {
 
     function makeCommitment(
         bytes32 _activityKey,
-        // uint256 _measureIndex, // index of the Activity.measures array
-        uint256 _goal,
-        bool _timed,
+        uint256 _goalValue,
         uint256 _startTime,
         uint256 _stake
     ) public returns (bool) {
@@ -134,7 +129,7 @@ contract SinglePlayerCommit is Ownable {
             "SPC::makeCommitment - activity doesn't exist or isn't allowed"
         );
         require(_startTime > block.timestamp, "SPC::makeCommitment - commitment cannot start in the past");
-        require(_goal >= 1, "SPC::makeCommitment - goal is too low");
+        require(_goalValue > 1, "SPC::makeCommitment - goal is too low");
         require(balances[msg.sender] >= _stake, "SPC::makeCommitment - insufficient token balance");
 
         uint256 endTime = _startTime.add(7 days);
@@ -143,8 +138,7 @@ contract SinglePlayerCommit is Ownable {
         Commitment memory commitment = Commitment({
             committer: msg.sender,
             activityKey: _activityKey,
-            goal: _goal,
-            timed: _timed,
+            goalValue: _goalValue,
             startTime: _startTime,
             endTime: endTime,
             stake: _stake,
@@ -156,7 +150,7 @@ contract SinglePlayerCommit is Ownable {
         // ...and add it to storage
         commitments[msg.sender] = commitment;
 
-        emit NewCommitment(msg.sender, allowedActivities[_activityKey].name, _goal, _timed, _startTime, endTime, _stake);
+        emit NewCommitment(msg.sender, allowedActivities[_activityKey].name, _goalValue, _startTime, endTime, _stake);
 
         return true;
     }
