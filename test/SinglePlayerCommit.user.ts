@@ -80,13 +80,12 @@ export function userCanManageCommitments(): void {
     it("not make a commitment without deposited funds", async function () {
       //Transaction
       const _activity: string = await this.singlePlayerCommit.activityList(0);
-      const _measureIndex: number = 0;
-      const _goal: number = 50;
+      const _goalValue: number = 50;
       const _startTime: number = Date.now();
       const _amountToStake: BigNumber = utils.parseEther("50.0");
 
       await expect(
-        contractWithUser.makeCommitment(_activity, _measureIndex, _goal, _startTime, _amountToStake, _overrides),
+        contractWithUser.makeCommitment(_activity, _goalValue, _startTime, _amountToStake, _overrides),
       ).to.be.revertedWith("SPC::makeCommitment - insufficient token balance");
     });
 
@@ -102,41 +101,26 @@ export function userCanManageCommitments(): void {
 
       //Default parameters
       let _activity: BytesLike = await this.singlePlayerCommit.activityList(0);
-      let _measureIndex: number = 0;
-      let _goal: number = 50;
-      let _startTime: number = Date.now();
+      let _goalValue: number = 50;
+      let _startTime: number = Date.now().valueOf();
       const _amountToStake: BigNumber = utils.parseEther("50.0");
 
       //Activity
       _activity = '0xb16dfc4a050ca7e77c1c5f443dc473a2f03ac722e25f721ab6333875f44984f2';
 
       await expect(
-        contractWithUser.makeCommitment(_activity, _measureIndex, _goal, _startTime, _amountToStake, _overrides),
+        contractWithUser.makeCommitment(_activity, _goalValue, _startTime, _amountToStake, _overrides),
       ).to.be.revertedWith("SPC::makeCommitment - activity doesn't exist or isn't allowed");
       _activity = await this.singlePlayerCommit.activityList(0);
 
-      //Measure
-      _measureIndex = 1;
+       //Goal
+      _goalValue = 1;
 
       await expect(
-        contractWithUser.makeCommitment(_activity, _measureIndex, _goal, _startTime, _amountToStake, _overrides),
-      ).to.be.revertedWith("SPC::makeCommitment - measure index out of bounds");
-      _measureIndex = 0;
-
-      //Goal
-      _goal = 1;
-
-      await expect(
-        contractWithUser.makeCommitment(_activity, _measureIndex, _goal, _startTime, _amountToStake, _overrides),
+        contractWithUser.makeCommitment(_activity, _goalValue, _startTime, _amountToStake, _overrides),
       ).to.be.revertedWith("SPC::makeCommitment - goal is too low");
 
-      _goal = 9999;
-
-      await expect(
-        contractWithUser.makeCommitment(_activity, _measureIndex, _goal, _startTime, _amountToStake, _overrides),
-      ).to.be.revertedWith("SPC::makeCommitment - goal is too high");
-
-      _goal = 50;
+      _goalValue = 50;
 
       //Start time
       //TODO Not reverting on time before current
@@ -177,19 +161,18 @@ export function userCanManageCommitments(): void {
 
       //Transaction
       const _activity: string = await this.singlePlayerCommit.activityList(0);
-      const _measureIndex: number = 0;
-      const _goal: number = 50;
+      const _goalValue: number = 50;
       const _startTime: number = Date.now();
       const _amountToStake: BigNumber = utils.parseEther("50.0");
-      const _expectedEndTime = addDays(_startTime, 7);
 
       await this.token.mock.transfer.returns(true);
       await expect(
-        contractWithUser.makeCommitment(_activity, _measureIndex, _goal, _startTime, _amountToStake, _overrides),
+        contractWithUser.makeCommitment(_activity, _goalValue, _startTime, _amountToStake, _overrides),
       ).to.emit(this.singlePlayerCommit, "NewCommitment");
 
       //Validate
       const commitment = await this.singlePlayerCommit.commitments(user.getAddress());
+      const activityName = await this.singlePlayerCommit.getActivityName(commitment.activityKey);
       const _updatedUserBalance: BigNumber = await user.getBalance();
       const _updatedUserDaiBalanceInContract: BigNumber = await this.singlePlayerCommit.balances(user.getAddress());
       const _updatedCommitterBalance: BigNumber = await this.singlePlayerCommit.committerBalance.call();
@@ -199,12 +182,11 @@ export function userCanManageCommitments(): void {
       expect(_updatedCommitterBalance).to.equal(utils.parseEther("100.0"));
 
       expect(commitment.committer).to.be.properAddress;
-      expect(await this.singlePlayerCommit.getActivityName(commitment.activity)).to.equal("biking");
-      expect(await this.singlePlayerCommit.getMeasureName(commitment.measure)).to.equal("km");
-      expect(commitment.goalValue.toNumber()).to.equal(_goal);
+      expect(activityName).to.equal("biking");
+      expect(commitment.goalValue.toNumber()).to.equal(_goalValue);
       expect(commitment.stake).to.equal(_amountToStake);
-      expect(commitment.start).to.equal(_startTime);
-      expect(commitment.end).to.not.be.undefined; //milliseconds, timing make equal difficult
+      expect(commitment.startTime).to.equal(_startTime);
+      expect(commitment.endTime).to.not.be.undefined; //milliseconds, timing make equal difficult
     });
 
     it("not make more than one commitment", async function () {
@@ -214,14 +196,13 @@ export function userCanManageCommitments(): void {
 
       //Transaction
       const _activity: BytesLike = await this.singlePlayerCommit.activityList(0);
-      const _measureIndex: number = 0;
       const _goal: number = 50;
       const _startTime: number = Date.now();
       const _amountToStake: BigNumber = utils.parseEther("50.0");
 
       await this.token.mock.transfer.returns(true);
       await expect(
-        contractWithUser.makeCommitment(_activity, _measureIndex, _goal, _startTime, _amountToStake, _overrides),
+        contractWithUser.makeCommitment(_activity, _goal, _startTime, _amountToStake, _overrides),
       ).to.be.revertedWith("SPC::makeCommitment - msg.sender already has a commitment");
     });
 
@@ -249,6 +230,7 @@ export function userCanManageCommitments(): void {
         "CommitmentEnded",
       );
       expect(commitment.exists).to.be.false;
+      console.log("LALALALALLALAL");
     });
 
     //TODO Currently failing on active commitment; need fixture or cleanup
@@ -265,8 +247,7 @@ export function userCanManageCommitments(): void {
 
       //Transaction
       const _activity: BytesLike = await this.singlePlayerCommit.activityList(0);
-      const _measureIndex: number = 0;
-      const _goal: number = 50;
+      const _goalValue: number = 50;
       const _startTime: number = Date.now();
       const _amountToStake: BigNumber = utils.parseEther("50.0");
       const _amountToDeposit: BigNumber = utils.parseEther("100.0");
@@ -276,15 +257,14 @@ export function userCanManageCommitments(): void {
       await expect(
         contractWithUser.depositAndCommit(
           _activity,
-          _measureIndex,
-          _goal,
+          _goalValue,
           _startTime,
           _amountToStake,
           _amountToDeposit,
           _overrides,
         ),
       ).to.emit(this.singlePlayerCommit, "NewCommitment")
-      .withArgs(await user.getAddress(), _activity, _measureIndex, _startTime, _expectedEndTime,_amountToStake);
+      .withArgs(await user.getAddress(), _activity, _goalValue, _startTime, _expectedEndTime,_amountToStake);
 
       // expect("transferFrom").to.be.calledOnContract(this.token);
       // expect("deposit").to.be.calledOnContract(this.singlePlayerCommit);
@@ -302,8 +282,7 @@ export function userCanManageCommitments(): void {
 
       expect(commitment.committer).to.be.properAddress;
       expect(await this.singlePlayerCommit.getActivityName(commitment.activity)).to.equal("biking");
-      expect(await this.singlePlayerCommit.getMeasureName(commitment.measure)).to.equal("km");
-      expect(commitment.goalValue.toNumber()).to.equal(_goal);
+      expect(commitment.goalValue.toNumber()).to.equal(_goalValue);
       expect(commitment.stake).to.equal(_amountToStake);
       expect(commitment.start).to.equal(_startTime);
     });

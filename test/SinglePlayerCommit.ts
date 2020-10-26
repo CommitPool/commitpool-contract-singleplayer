@@ -20,25 +20,21 @@ setTimeout(async function () {
     let accounts: Signer[];
     let owner: Signer;
 
-    const activity: string = "biking";
-    const measures: string[] = ["km"];
-    const ranges: BigNumberish[][] = [[2, 1024]];
+    const supportedActivities: string[] = ["biking", "running"];
+
 
     before(async function () {
       console.log("Setting up environment [provider, signers, mock contracts]")
-      // ethers.provider = new MockProvider();
       accounts = await ethers.getSigners();
       owner = accounts[0];
       this.oracle = await waffle.deployMockContract(owner, chainLinkArtifact);
       this.token = await waffle.deployMockContract(owner, daiArtifact);
 
-      console.log("Deploying SinglePlayerCommit with %s, %s, and %s", activity, measures, ranges[0]);
+      console.log("Deploying SinglePlayerCommit with %s", supportedActivities);
       const SinglePlayerCommit: ContractFactory = await ethers.getContractFactory("SinglePlayerCommit");
 
       this.singlePlayerCommit = (await SinglePlayerCommit.deploy(
-        activity,
-        measures,
-        ranges,
+        supportedActivities,
         this.oracle.address,
         this.token.address,
       )) as SinglePlayerCommit;

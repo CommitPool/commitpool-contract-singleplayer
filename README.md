@@ -16,28 +16,13 @@ Currently Ganache and Node 14 are not playing well together. To get started:
 
 ## Features
 
-Single Player mode features:
-
-- [x] Creation of Commitment
-- [ ] Management of Activities
-- [ ] Management of Measures
-- [x] Execution of commitment settlement
-
 #### Creation of Commitment
 
-A commitment consists of an ```activity```, a ```measure``` for given activity, a ```start time```, and ```stake```. We will set the ```end date``` 7 days after the startdate.
+A commitment consists of an ```activity```, a ```goalValue``` for given activity, a ```startTime```, and ```stake```. We will automagically set the ```endTime``` 7 days after the startdate.
 
 #### Management of Activities
 
-An activity consists of a ```name```, a ```measure``` to express activity metrics, an array of accepted ```ranges```, and the ```oracle``` address. Activities can be enabled by setting it to ```allowed```.
-
-For the Single Player mode ```biking``` is the only available activity, as declared in ```scripts/deploy.ts```
-
-#### Management of Measures
-
-A measure has a ```name``` and can be enabled by setting it to ```allowed```.
-
-For the Single Player mode ```km``` is the only available measure, as declared in ```scripts/deploy.ts```
+An activity consists of a ```name``` and the ```oracle``` address. Activities can be enabled by setting it to ```allowed```.
 
 #### Execution of commitment settlement
 
