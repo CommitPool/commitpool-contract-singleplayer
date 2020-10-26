@@ -3,7 +3,7 @@ import { BytesLike, solidityKeccak256 } from "ethers/lib/utils";
 
 export function shouldDeployWithInitialParameters(): void {
 
-  it("has the 'biking' and 'cycling' activity and it is allowed", async function () {
+  it("has the 'biking' and 'running' activity and it is allowed", async function () {
     const _activityNames: string[] = ["biking", "running"];
     const _activityKeys: BytesLike[] = [];
     const _activities = [];
