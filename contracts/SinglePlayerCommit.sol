@@ -4,10 +4,13 @@ pragma experimental ABIEncoderV2;
 
 import "@nomiclabs/buidler/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
+// import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@chainlink/contracts/src/v0.6/ChainlinkClient.sol";
+//https://github.com/smartcontractkit/chainlink/issues/3153#issuecomment-655241638
+import "@chainlink/contracts/src/v0.6/vendor/SafeMath.sol";
 
-contract SinglePlayerCommit is Ownable {
+contract SinglePlayerCommit is ChainlinkClient, Ownable {
     using SafeMath for uint256;
 
     /******************
@@ -15,6 +18,7 @@ contract SinglePlayerCommit is Ownable {
     ******************/
     IERC20 public token;
     uint256 BIGGEST_NUMBER = uint256(-1);
+    uint256 constant private ORACLE_PAYMENT = 1 * LINK;
 
     /***************
     DATA TYPES
@@ -35,6 +39,7 @@ contract SinglePlayerCommit is Ownable {
         bool exists; // flag to help check if commitment exists
         uint256 reportedValue; // as reported by oracle
         bool met; // whether the commitment has been met
+        string userId;
     }
 
     /***************
@@ -51,6 +56,10 @@ contract SinglePlayerCommit is Ownable {
     event CommitmentEnded(address committer, bool met, uint256 amountPenalized);
     event Deposit(address committer, uint256 amount);
     event Withdrawal(address committer, uint256 amount);
+    event RequestActivityDistanceFulfilled(
+        bytes32 indexed requestId,
+        uint256 indexed distance
+    );
 
     /******************
     INTERNAL ACCOUNTING
@@ -63,6 +72,8 @@ contract SinglePlayerCommit is Ownable {
 
     mapping(address => uint256) public balances; // current token balances
     uint256 public committerBalance; // sum of current token balances
+    mapping(bytes32 => address) public jobAddresses; // holds the address that ran the job
+    mapping(address => uint256) public addressDistances; // holds the distance covered by this address
 
     /********
     FUNCTIONS
@@ -94,10 +105,11 @@ contract SinglePlayerCommit is Ownable {
         uint256 _goalValue,
         uint256 _startTime,
         uint256 _stake,
-        uint256 _depositAmount
+        uint256 _depositAmount,
+        string memory _userId
     ) public returns (bool) {
         require(deposit(_depositAmount), "SPC::depositAndCommit - deposit failed");
-        require(makeCommitment(_activityKey, _goalValue, _startTime, _stake), "SPC::depositAndCommit - commitment failed");
+        require(makeCommitment(_activityKey, _goalValue, _startTime, _stake, _userId), "SPC::depositAndCommit - commitment failed");
 
         return true;
     }
@@ -119,7 +131,8 @@ contract SinglePlayerCommit is Ownable {
         bytes32 _activityKey,
         uint256 _goalValue,
         uint256 _startTime,
-        uint256 _stake
+        uint256 _stake,
+        string memory _userId
     ) public returns (bool) {
         console.log("makeCommitment called by %s", msg.sender);
 
@@ -144,7 +157,8 @@ contract SinglePlayerCommit is Ownable {
             stake: _stake,
             exists: true,
             reportedValue: 0,
-            met: false
+            met: false,
+            userId: _userId
         });
 
         // ...and add it to storage
@@ -183,6 +197,10 @@ contract SinglePlayerCommit is Ownable {
 
         // check if commitment has ended
         require(commitment.endTime < block.timestamp, "SPC::processCommitment - commitment is still active");
+
+        uint256 distance = addressDistances[committer];
+        // uint256 distance = 2;
+        commitment.met = distance > commitment.goalValue;
 
         bool met = commitment.met;
         uint256 stake = commitment.stake;
@@ -259,5 +277,78 @@ contract SinglePlayerCommit is Ownable {
         }
 
         return true;
+    }
+
+    //Chainlink functions
+    function requestActivityDistance(address _committer, address _oracle, string memory _jobId)
+        public
+    {
+        Commitment memory commitment = commitments[_committer];
+        Chainlink.Request memory req = buildChainlinkRequest(stringToBytes32(_jobId), address(this), this.fulfillActivityDistance.selector);
+        req.add("type", allowedActivities[commitment.activityKey].name);
+        req.add("startTime", uint2str(commitment.startTime));
+        req.add("endTime", uint2str(commitment.endTime));
+        req.add("userId", commitment.userId);
+
+        bytes32 requestId = sendChainlinkRequestTo(_oracle, req, ORACLE_PAYMENT);
+        jobAddresses[requestId] = _committer;
+    }
+
+    function fulfillActivityDistance(bytes32 _requestId, uint256 _distance)
+        public
+        recordChainlinkFulfillment(_requestId)
+    {
+        emit RequestActivityDistanceFulfilled(_requestId, _distance);
+        address userAddress = jobAddresses[_requestId];
+        addressDistances[userAddress] = _distance;
+    }
+
+    function getChainlinkToken() public view returns (address) {
+        return chainlinkTokenAddress();
+    }
+
+    function withdrawLink() public onlyOwner {
+        LinkTokenInterface link = LinkTokenInterface(chainlinkTokenAddress());
+        require(link.transfer(msg.sender, link.balanceOf(address(this))), "Unable to transfer");
+    }
+
+    function cancelRequest(
+        bytes32 _requestId,
+        uint256 _payment,
+        bytes4 _callbackFunctionId,
+        uint256 _expiration
+    )
+        public
+        onlyOwner
+    {
+        cancelChainlinkRequest(_requestId, _payment, _callbackFunctionId, _expiration);
+    }
+
+    function stringToBytes32(string memory source) private pure returns (bytes32 result) {
+        bytes memory tempEmptyStringTest = bytes(source);
+        if (tempEmptyStringTest.length == 0) {
+        return 0x0;
+        }
+
+        assembly { // solhint-disable-line no-inline-assembly
+        result := mload(add(source, 32))
+        }
+    }
+    
+    function uint2str(uint i) internal pure returns (string memory str){
+        if (i == 0) return "0";
+        uint j = i;
+        uint length;
+        while (j != 0){
+            length++;
+            j /= 10;
+        }
+        bytes memory bstr = new bytes(length);
+        uint k = length - 1;
+        while (i != 0){
+            bstr[k--] = byte(uint8(48 + i % 10)); 
+            i /= 10;
+        }
+        return string(bstr);
     }
 }
