@@ -10,6 +10,8 @@ import "@chainlink/contracts/src/v0.6/ChainlinkClient.sol";
 //https://github.com/smartcontractkit/chainlink/issues/3153#issuecomment-655241638
 import "@chainlink/contracts/src/v0.6/vendor/SafeMath.sol";
 
+/// @title CommitPool single-player mode contract
+/// @notice Enables staking and validating performance. No social/pool functionality.
 contract SinglePlayerCommit is ChainlinkClient, Ownable {
     using SafeMath for uint256;
 
@@ -23,8 +25,9 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     /***************
     DATA TYPES
     ***************/
+    /// @notice Activity as part of commitment with oracle address. E.g. "cycling" with ChainLink Strava node 
     struct Activity {
-        string name; // e.g. "cycling" with list scoped to activities supported by Strava
+        string name;
         address oracle;
         bool allowed;
     }
@@ -114,6 +117,9 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         return true;
     }
 
+    /// @notice Deposit amount of <token> into contract
+    /// @param amount Size of deposit
+    /// @dev Transfer to contract, update balance, emit event
     function deposit(uint256 amount) public returns (bool) {
         console.log("Received call for depositing amount %s from sender %s", amount, msg.sender);
         // make deposit
@@ -127,6 +133,13 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         return true;
     }
 
+    /// @notice Create commitment, store on-chain and emit event
+    /// @param _activityKey Keccak256 hashed, encoded name of activity
+    /// @param _goalValue Distance of activity as goal
+    /// @param _startTime Starttime of commitment, also used for endTime
+    /// @param _stake Amount of <token> to stake againt achieving goal
+    /// @param _userId ???
+    /// @dev Check parameters, create commitment, store on-chain and emit event
     function makeCommitment(
         bytes32 _activityKey,
         uint256 _goalValue,
@@ -147,7 +160,6 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
 
         uint256 endTime = _startTime.add(7 days);
 
-        // create commitment...
         Commitment memory commitment = Commitment({
             committer: msg.sender,
             activityKey: _activityKey,
@@ -161,7 +173,6 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
             userId: _userId
         });
 
-        // ...and add it to storage
         commitments[msg.sender] = commitment;
 
         emit NewCommitment(msg.sender, allowedActivities[_activityKey].name, _goalValue, _startTime, endTime, _stake);
@@ -169,12 +180,14 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         return true;
     }
 
+    /// @notice Withdraw unstaked balance for user
+    /// @param amount Amount of <token> to withdraw
+    /// @dev Check balances, withdraw from balances, emit event
     function withdraw(uint256 amount) public returns (bool) {
         console.log("Received call for withdrawing amount %s from sender %s", amount, msg.sender);
         uint256 available = balances[msg.sender].sub(commitments[msg.sender].stake);
         require(amount >= available, "SPC::withdraw - not enough balance available");
 
-        // remove from committer's balance
         _changeCommitterBalance(amount, false);
 
         require(token.transfer(msg.sender, amount), "SPC::withdraw - token transfer failed");
@@ -184,28 +197,21 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         return true;
     }
 
-    // TODO
-    function report() public returns (bool) {
-        // get activity data from oracle
-        // record activity data in commitments
-        return true;
-    }
-
+    /// @notice Enables processing of open commitments after endDate that have not been processed by creator
+    /// @param committer address of the creator of the committer to process
+    /// @dev Process commitment by lookup based on address, checking metrics, state and updating balances
     function processCommitment(address committer) public {
         console.log("Processing commitment");
         Commitment memory commitment = commitments[committer];
 
-        // check if commitment has ended
         require(commitment.endTime < block.timestamp, "SPC::processCommitment - commitment is still active");
 
         uint256 distance = addressDistances[committer];
-        // uint256 distance = 2;
         commitment.met = distance > commitment.goalValue;
 
         bool met = commitment.met;
         uint256 stake = commitment.stake;
 
-        // "delete" the expired commitment
         commitments[committer].exists = false;
 
         uint256 penalty;
@@ -214,13 +220,41 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
             penalty = 0;
         } else {
             penalty = stake;
-            // remove from committer's balance
             _changeCommitterBalance(penalty, false);
         }
 
         emit CommitmentEnded(committer, met, penalty);
     }
 
+    /// @notice Enables control of processing own commitment. For instance when completed.
+    /// @dev Process commitment by lookup msg.sender, checking metrics, state and updating balances
+    function processCommitmentUser() public {
+        console.log("Processing commitment");
+        address committer = msg.sender;
+        Commitment memory commitment = commitments[committer];
+
+        uint256 distance = addressDistances[committer];
+        commitment.met = distance > commitment.goalValue;
+
+        bool met = commitment.met;
+        uint256 stake = commitment.stake;
+
+        commitments[committer].exists = false;
+
+        uint256 penalty;
+
+        if (met) {
+            penalty = 0;
+        } else {
+            penalty = stake;
+            _changeCommitterBalance(penalty, false);
+        }
+
+        emit CommitmentEnded(committer, met, penalty);
+    }
+
+    /// @notice Contract owner can withdraw funds not owned by committers. E.g. slashed from failed commitments
+    /// @param amount Amount of <token> to withdraw
     function ownerWithdraw(uint256 amount) public onlyOwner returns (bool) {
         uint256 available = token.balanceOf(address(this)).sub(committerBalance);
 
@@ -231,6 +265,10 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     }
 
     // internal functions
+    /// @notice Adds list of activities with oracle (i.e. datasource) to contract
+    /// @param _activityList String list of activities reported by oracle
+    /// @param oracleAddress Address of oracle for activity data
+    /// @dev Basically just loops over _addActivity for list
     function _addActivities(string[] memory _activityList, address oracleAddress) internal {
         uint256 arrayLength = _activityList.length;
 
@@ -241,6 +279,10 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         console.log("All provided activities added");
     }
 
+    /// @notice Add activity to contract's activityList
+    /// @param _activityName String name of activity
+    /// @param _oracleAddress Contract address of oracle
+    /// @dev Create key from name, create activity, push to activityList, return key
     function _addActivity(string memory _activityName, address _oracleAddress) internal returns (bytes32 activityKey) {
         bytes memory activityNameBytes = bytes(_activityName);
         require(activityNameBytes.length > 0, "SPC::_addActivity - _activityName empty");
@@ -280,6 +322,11 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     }
 
     //Chainlink functions
+    /// @notice Call ChainLink node to report distance measured based on Strava data
+    /// @param _committer Address of creator of commitment
+    /// @param _oracle ChainLink oracle address
+    /// @param _jobId ???
+    /// @dev Async function sending request to ChainLink node
     function requestActivityDistance(address _committer, address _oracle, string memory _jobId)
         public
     {
@@ -294,6 +341,10 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         jobAddresses[requestId] = _committer;
     }
 
+    /// @notice Register distance reported by ChainLink node
+    /// @param _requestId ID or request triggering the method call
+    /// @param _distance Distance to register
+    /// @dev Follow-up function to requestActivityDistance
     function fulfillActivityDistance(bytes32 _requestId, uint256 _distance)
         public
         recordChainlinkFulfillment(_requestId)
@@ -303,10 +354,13 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         addressDistances[userAddress] = _distance;
     }
 
+    /// @notice Get address for ChainLink token contract
+    /// @dev ChainLink contract method
     function getChainlinkToken() public view returns (address) {
         return chainlinkTokenAddress();
     }
 
+    /// @notice Withdraw ChainLink token from contract to contract owner
     function withdrawLink() public onlyOwner {
         LinkTokenInterface link = LinkTokenInterface(chainlinkTokenAddress());
         require(link.transfer(msg.sender, link.balanceOf(address(this))), "Unable to transfer");

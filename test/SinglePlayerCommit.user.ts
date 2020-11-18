@@ -11,6 +11,7 @@ export function userCanManageCommitments(): void {
     const _overrides = {
       gasLimit: 1000000,
     };
+    const userId = "testUser";
 
     before(async function () {
       [owner, user] = await ethers.getSigners();
@@ -85,7 +86,7 @@ export function userCanManageCommitments(): void {
       const _amountToStake: BigNumber = utils.parseEther("50.0");
 
       await expect(
-        contractWithUser.makeCommitment(_activity, _goalValue, _startTime, _amountToStake, _overrides),
+        contractWithUser.makeCommitment(_activity, _goalValue, _startTime, _amountToStake, userId, _overrides),
       ).to.be.revertedWith("SPC::makeCommitment - insufficient token balance");
     });
 
@@ -109,7 +110,7 @@ export function userCanManageCommitments(): void {
       _activity = '0xb16dfc4a050ca7e77c1c5f443dc473a2f03ac722e25f721ab6333875f44984f2';
 
       await expect(
-        contractWithUser.makeCommitment(_activity, _goalValue, _startTime, _amountToStake, _overrides),
+        contractWithUser.makeCommitment(_activity, _goalValue, _startTime, _amountToStake, userId, _overrides),
       ).to.be.revertedWith("SPC::makeCommitment - activity doesn't exist or isn't allowed");
       _activity = await this.singlePlayerCommit.activityList(0);
 
@@ -117,7 +118,7 @@ export function userCanManageCommitments(): void {
       _goalValue = 1;
 
       await expect(
-        contractWithUser.makeCommitment(_activity, _goalValue, _startTime, _amountToStake, _overrides),
+        contractWithUser.makeCommitment(_activity, _goalValue, _startTime, _amountToStake, userId, _overrides),
       ).to.be.revertedWith("SPC::makeCommitment - goal is too low");
 
       _goalValue = 50;
@@ -167,7 +168,7 @@ export function userCanManageCommitments(): void {
 
       await this.token.mock.transfer.returns(true);
       await expect(
-        contractWithUser.makeCommitment(_activity, _goalValue, _startTime, _amountToStake, _overrides),
+        contractWithUser.makeCommitment(_activity, _goalValue, _startTime, _amountToStake, userId, _overrides),
       ).to.emit(this.singlePlayerCommit, "NewCommitment");
 
       //Validate
@@ -202,7 +203,7 @@ export function userCanManageCommitments(): void {
 
       await this.token.mock.transfer.returns(true);
       await expect(
-        contractWithUser.makeCommitment(_activity, _goal, _startTime, _amountToStake, _overrides),
+        contractWithUser.makeCommitment(_activity, _goal, _startTime, _amountToStake, userId, _overrides),
       ).to.be.revertedWith("SPC::makeCommitment - msg.sender already has a commitment");
     });
 
@@ -261,10 +262,11 @@ export function userCanManageCommitments(): void {
           _startTime,
           _amountToStake,
           _amountToDeposit,
+          userId,
           _overrides,
         ),
       ).to.emit(this.singlePlayerCommit, "NewCommitment")
-      .withArgs(await user.getAddress(), _activity, _goalValue, _startTime, _expectedEndTime,_amountToStake);
+      .withArgs(await user.getAddress(), _activity, _goalValue, _startTime, _expectedEndTime, _amountToStake);
 
       // expect("transferFrom").to.be.calledOnContract(this.token);
       // expect("deposit").to.be.calledOnContract(this.singlePlayerCommit);
