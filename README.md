@@ -14,6 +14,18 @@ Currently Ganache and Node 14 are not playing well together. To get started:
 3. ```npm run-script build```
 4. ```npm test``` (to verify the build)
 
+#### Deploying to local node
+Buidler
+
+1. Use node 12 (using nvm is recommended)
+2. ```npx buidler node```
+3. In second terminal```npx buidler run --network localhost scripts/deploy.ts  ```
+
+Ganache
+
+1. Use node 12 (using nvm is recommended)
+2. Start Ganache on port 8545
+3. In second terminal```npx buidler run --network localhost scripts/deploy.ts  ```
 ## Features
 
 #### Creation of Commitment
@@ -35,6 +47,12 @@ The contract can be called to process the commitment based on the address of the
 ## Stack
 
 This repository is a fork from [Paul Berg's Solidity Template](https://github.com/PaulRBerg/solidity-template)
+
+#### Deploying to Ganache
+
+Check network setup in ```buidler.config.ts```
+
+```npx buidler run --network localhostGanache scripts/deploy.ts```
 
 ## Get in touch
 

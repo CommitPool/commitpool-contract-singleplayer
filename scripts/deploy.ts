@@ -12,20 +12,11 @@ async function main(): Promise<void> {
   // await run("compile");
 
   // We get the contract to deploy
-
-  // Contract SingleplayerCommit
-  // string memory _activity,
-  // string[] memory _measures,
-  // uint256[2][] memory _ranges,
-  // address _oracle,
-  // address _token
-  const activity: string = "biking";
-  const measures: string[] = ["km"];
-  const ranges: BigNumberish[][] = [[2, 1024]];
-  const oracle: string = "";
-  const token: string = "";
+  const activities: string[] = ["biking", "cycling"];
+  const oracle: string = "0x514910771af9ca656af840dff83e8264ecf986ca";
+  const token: string = "0x6b175474e89094c44da98b954eedeac495271d0f";
   const SinglePlayerCommit: ContractFactory = await ethers.getContractFactory("SinglePlayerCommit");
-  const singlePlayerCommit: Contract = await SinglePlayerCommit.deploy(activity, measures, ranges, oracle, token);
+  const singlePlayerCommit: Contract = await SinglePlayerCommit.deploy(activities, oracle, token);
   await singlePlayerCommit.deployed();
 
   console.log("SinglePlayerCommit deployed to: ", singlePlayerCommit.address);
