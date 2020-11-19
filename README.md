@@ -26,6 +26,16 @@ Ganache
 1. Use node 12 (using nvm is recommended)
 2. Start Ganache on port 8545
 3. In second terminal```npx buidler run --network localhost scripts/deploy.ts  ```
+
+
+#### Interacting with the contract
+After deploying to a local node
+1. ```npx buidler console --network localhost     ```
+2. ```const CommitPool = await ethers.getContractFactory("SinglePlayerCommit")```
+3. ```const commitPool = await CommitPool.attach("<<CONTRACT ADDRESS FROM DEPLOYMENT>>")```
+
+Example for interacting:
+```await commitPool.withdraw(1000)```
 ## Features
 
 #### Creation of Commitment

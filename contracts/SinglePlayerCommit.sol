@@ -63,6 +63,8 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         bytes32 indexed requestId,
         uint256 indexed distance
     );
+    event ActivityUpdated(string name, bytes32 activityKey, address oracle, bool allowed);
+
 
     /******************
     INTERNAL ACCOUNTING
@@ -74,9 +76,14 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     address[] public userCommitments; // addresses with active commitments
 
     mapping(address => uint256) public balances; // current token balances
+    //TODO Keep track of staked balances
+
     uint256 public committerBalance; // sum of current token balances
+
     mapping(bytes32 => address) public jobAddresses; // holds the address that ran the job
-    mapping(address => uint256) public addressDistances; // holds the distance covered by this address
+
+    //TODO Maybe move this information to the Commitment and update the reportedValue?
+    //mapping(address => uint256) public addressDistances; // holds the distance covered by this address
 
     /********
     FUNCTIONS
@@ -131,13 +138,11 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
 
     /// @notice Deposit amount of <token> into contract
     /// @param amount Size of deposit
-    /// @dev Transfer to contract, update balance, emit event
+    /// @dev Transfer amount to <token> contract, update balance, emit event
     function deposit(uint256 amount) public returns (bool) {
         console.log("Received call for depositing amount %s from sender %s", amount, msg.sender);
-        // make deposit
         require(token.transferFrom(msg.sender, address(this), amount), "SPC::deposit - token transfer failed");
 
-        // update committer's balance
         _changeCommitterBalance(amount, true);
 
         emit Deposit(msg.sender, amount);
@@ -197,6 +202,8 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     /// @dev Check balances, withdraw from balances, emit event
     function withdraw(uint256 amount) public returns (bool) {
         console.log("Received call for withdrawing amount %s from sender %s", amount, msg.sender);
+        //TODO check if an active commitment exists
+        //TODO if no commitment, balances can be withdrawn to 0
         uint256 available = balances[msg.sender].sub(commitments[msg.sender].stake);
         require(amount >= available, "SPC::withdraw - not enough balance available");
 
@@ -218,24 +225,14 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
 
         require(commitment.endTime < block.timestamp, "SPC::processCommitment - commitment is still active");
 
-        uint256 distance = addressDistances[committer];
-        commitment.met = distance > commitment.goalValue;
+        commitment.met = commitment.reportedValue > commitment.goalValue;
 
-        bool met = commitment.met;
-        uint256 stake = commitment.stake;
-
-        commitments[committer].exists = false;
-
-        uint256 penalty;
-
-        if (met) {
-            penalty = 0;
-        } else {
-            penalty = stake;
-            _changeCommitterBalance(penalty, false);
-        }
-
-        emit CommitmentEnded(committer, met, penalty);
+        if (!commitment.met) {
+            _changeCommitterBalance(commitment.stake, false);
+        } 
+        
+        commitment.exists = false;
+        emit CommitmentEnded(committer, commitment.met, commitment.stake);
     }
 
     /// @notice Enables control of processing own commitment. For instance when completed.
@@ -245,29 +242,20 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         address committer = msg.sender;
         Commitment memory commitment = commitments[committer];
 
-        uint256 distance = addressDistances[committer];
-        commitment.met = distance > commitment.goalValue;
+        commitment.met = commitment.reportedValue > commitment.goalValue;
 
-        bool met = commitment.met;
-        uint256 stake = commitment.stake;
-
-        commitments[committer].exists = false;
-
-        uint256 penalty;
-
-        if (met) {
-            penalty = 0;
-        } else {
-            penalty = stake;
-            _changeCommitterBalance(penalty, false);
-        }
-
-        emit CommitmentEnded(committer, met, penalty);
+        if (!commitment.met) {
+            _changeCommitterBalance(commitment.stake, false);
+        } 
+        
+        commitment.exists = false;
+        emit CommitmentEnded(committer, commitment.met, commitment.stake);
     }
 
     /// @notice Contract owner can withdraw funds not owned by committers. E.g. slashed from failed commitments
     /// @param amount Amount of <token> to withdraw
     function ownerWithdraw(uint256 amount) public onlyOwner returns (bool) {
+        //TODO Require check for committerbalance compared to contractBalance
         uint256 available = token.balanceOf(address(this)).sub(committerBalance);
 
         require(amount <= available, "SPC::ownerWithdraw - not enough available balance");
@@ -314,8 +302,14 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         );
 
         activityList.push(_activityKey);
+        emit ActivityUpdated(activity.name, _activityKey, activity.oracle, activity.allowed);
         return _activityKey;
     }
+
+    //TODO Update activity state method (oracle and/or allowed). Note: emit event
+    //function _updateActivityOracle(addres oracleAddress) onlyOwner 
+
+    //function _updateActivityAllowed(bool allowed) onlyOwner
 
     /// @notice Internal function to update balance of caller and total balance
     /// @param amount Amount of <token> to deposit/withdraw
@@ -363,7 +357,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     {
         emit RequestActivityDistanceFulfilled(_requestId, _distance);
         address userAddress = jobAddresses[_requestId];
-        addressDistances[userAddress] = _distance;
+        commitments[userAddress].reportedValue = _distance;
     }
 
     /// @notice Get address for ChainLink token contract
