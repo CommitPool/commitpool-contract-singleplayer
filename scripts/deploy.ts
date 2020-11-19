@@ -12,6 +12,7 @@ async function main(): Promise<void> {
   // await run("compile");
 
   // We get the contract to deploy
+  //TODO oracle and token to env.var
   const activities: string[] = ["biking", "cycling"];
   const oracle: string = "0x514910771af9ca656af840dff83e8264ecf986ca";
   const token: string = "0x6b175474e89094c44da98b954eedeac495271d0f";

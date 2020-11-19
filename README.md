@@ -48,12 +48,6 @@ The contract can be called to process the commitment based on the address of the
 
 This repository is a fork from [Paul Berg's Solidity Template](https://github.com/PaulRBerg/solidity-template)
 
-#### Deploying to Ganache
-
-Check network setup in ```buidler.config.ts```
-
-```npx buidler run --network localhostGanache scripts/deploy.ts```
-
 ## Get in touch
 
 [commitpool.com](http://commitpool.com/)

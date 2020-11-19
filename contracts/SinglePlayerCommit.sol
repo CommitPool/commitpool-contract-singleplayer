@@ -81,28 +81,40 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     /********
     FUNCTIONS
     ********/
-    // constructor
+    /// @notice Contract constructor used during deployment
+    /// @param _activityList String list of activities reported by oracle
+    /// @param _oracleAddress Address of oracle for activity data
+    /// @param _token Address of <token> contract
+    /// @dev Configure token address, add activities to activityList mapping by calling _addActivities method
     constructor(
         string[] memory _activityList,
         address _oracleAddress,
         address _token
     ) public {
         console.log("Constructor called for SinglePlayerCommit contract");
-        // set up token interface
         token = IERC20(_token);
         require(_activityList.length >= 1, "SPC::constructor - activityList empty");
 
-        // register allowed activities with corresponding oracle
         _addActivities(_activityList, _oracleAddress);
     }
 
     // view functions
-
+    /// @notice Get name string of activity based on key
+    /// @param _activityKey Keccak256 hashed, encoded name of activity
+    /// @dev Lookup in mapping and get name field
     function getActivityName(bytes32 _activityKey) public view returns (string memory) {
         return allowedActivities[_activityKey].name;
     }
 
     // other public functions
+    /// @notice Wrapper function to deposit <token> and create commitment in one call
+    /// @param _activityKey Keccak256 hashed, encoded name of activity
+    /// @param _goalValue Distance of activity as goal
+    /// @param _startTime Starttime of commitment, also used for endTime
+    /// @param _stake Amount of <token> to stake againt achieving goale
+    /// @param _depositAmount Size of deposit
+    /// @param _userId ???
+    /// @dev Call deposit and makeCommitment method
     function depositAndCommit(
         bytes32 _activityKey,
         uint256 _goalValue,
@@ -305,16 +317,16 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         return _activityKey;
     }
 
+    /// @notice Internal function to update balance of caller and total balance
+    /// @param amount Amount of <token> to deposit/withdraw
+    /// @param add Boolean toggle to deposit or withdraw
+    /// @dev Based on add param add or substract amount from msg.sender balance and total committerBalance
     function _changeCommitterBalance(uint256 amount, bool add) internal returns (bool) {
         if (add) {
-            // increase committer's token balance
             balances[msg.sender] = balances[msg.sender].add(amount);
-            // add to total committer balance sum
             committerBalance = committerBalance.add(amount);
         } else {
-            // decrease committer's token balance
             balances[msg.sender] = balances[msg.sender].sub(amount);
-            // decrease total committer balance sum
             committerBalance = committerBalance.sub(amount);
         }
 
