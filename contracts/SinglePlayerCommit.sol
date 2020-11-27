@@ -41,6 +41,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         uint256 stake; // amount of token staked, scaled by token decimals
         bool exists; // flag to help check if commitment exists
         uint256 reportedValue; // as reported by oracle
+        uint256 lastActivityUpdate 
         bool met; // whether the commitment has been met
         string userId;
     }
@@ -223,7 +224,9 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         console.log("Processing commitment");
         Commitment memory commitment = commitments[committer];
 
+        //TODO check if latest activity update after commitment.endtime
         require(commitment.endTime < block.timestamp, "SPC::processCommitment - commitment is still active");
+        require(commitment.endTime < commitment.lastActivityUpdate, "SPC::processCommitment - update activity");
 
         commitment.met = commitment.reportedValue > commitment.goalValue;
 
@@ -358,6 +361,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         emit RequestActivityDistanceFulfilled(_requestId, _distance);
         address userAddress = jobAddresses[_requestId];
         commitments[userAddress].reportedValue = _distance;
+        commitments[userAddress].lastActivityUpdate = block.timestamp;
     }
 
     /// @notice Get address for ChainLink token contract
