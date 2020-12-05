@@ -13,9 +13,13 @@ async function main(): Promise<void> {
 
   // We get the contract to deploy
   //TODO oracle and token to env.var
+  if (!process.env.ORACLE_ADDRESS || !process.env.TOKEN_ADDRESS) {
+    console.log("Please set your oracle and token address in a .env file");
+    process.exit(1);
+  }
   const activities: string[] = ["biking", "cycling"];
-  const oracle: string = "0x514910771af9ca656af840dff83e8264ecf986ca";
-  const token: string = "0x6b175474e89094c44da98b954eedeac495271d0f";
+  const oracle: string = process.env.ORACLE_ADDRESS;
+  const token: string = process.env.TOKEN_ADDRESS;
   const SinglePlayerCommit: ContractFactory = await ethers.getContractFactory("SinglePlayerCommit");
   const singlePlayerCommit: Contract = await SinglePlayerCommit.deploy(activities, oracle, token);
   await singlePlayerCommit.deployed();

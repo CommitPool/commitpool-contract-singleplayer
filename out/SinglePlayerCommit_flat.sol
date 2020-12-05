@@ -1,3 +1,5 @@
+// File: @nomiclabs/buidler/console.sol
+
 // SPDX-License-Identifier: MIT
 pragma solidity >= 0.4.22 <0.7.0;
 
@@ -1534,18 +1536,12 @@ library console {
 	}
 
 }
-/* SPDX-License-Identifier: MIT */
 
-pragma experimental ABIEncoderV2;
+// File: @openzeppelin/contracts/GSN/Context.sol
 
+// SPDX-License-Identifier: MIT
 
-
-
-
-
-
-
-
+pragma solidity ^0.6.0;
 
 /*
  * @dev Provides information about the current execution context, including the
@@ -1567,6 +1563,12 @@ abstract contract Context {
         return msg.data;
     }
 }
+
+// File: @openzeppelin/contracts/access/Ownable.sol
+
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.6.0;
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -1632,169 +1634,11 @@ contract Ownable is Context {
     }
 }
 
+// File: @openzeppelin/contracts/token/ERC20/IERC20.sol
 
+// SPDX-License-Identifier: MIT
 
-
-
-/**
- * @dev Wrappers over Solidity's arithmetic operations with added overflow
- * checks.
- *
- * Arithmetic operations in Solidity wrap on overflow. This can easily result
- * in bugs, because programmers usually assume that an overflow raises an
- * error, which is the standard behavior in high level programming languages.
- * `SafeMath` restores this intuition by reverting the transaction when an
- * operation overflows.
- *
- * Using this library instead of the unchecked operations eliminates an entire
- * class of bugs, so it's recommended to use it always.
- */
-library SafeMath {
-    /**
-     * @dev Returns the addition of two unsigned integers, reverting on
-     * overflow.
-     *
-     * Counterpart to Solidity's `+` operator.
-     *
-     * Requirements:
-     *
-     * - Addition cannot overflow.
-     */
-    function add(uint256 a, uint256 b) internal pure returns (uint256) {
-        uint256 c = a + b;
-        require(c >= a, "SafeMath: addition overflow");
-
-        return c;
-    }
-
-    /**
-     * @dev Returns the subtraction of two unsigned integers, reverting on
-     * overflow (when the result is negative).
-     *
-     * Counterpart to Solidity's `-` operator.
-     *
-     * Requirements:
-     *
-     * - Subtraction cannot overflow.
-     */
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-        return sub(a, b, "SafeMath: subtraction overflow");
-    }
-
-    /**
-     * @dev Returns the subtraction of two unsigned integers, reverting with custom message on
-     * overflow (when the result is negative).
-     *
-     * Counterpart to Solidity's `-` operator.
-     *
-     * Requirements:
-     *
-     * - Subtraction cannot overflow.
-     */
-    function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
-        require(b <= a, errorMessage);
-        uint256 c = a - b;
-
-        return c;
-    }
-
-    /**
-     * @dev Returns the multiplication of two unsigned integers, reverting on
-     * overflow.
-     *
-     * Counterpart to Solidity's `*` operator.
-     *
-     * Requirements:
-     *
-     * - Multiplication cannot overflow.
-     */
-    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-        // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
-        // benefit is lost if 'b' is also tested.
-        // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
-        if (a == 0) {
-            return 0;
-        }
-
-        uint256 c = a * b;
-        require(c / a == b, "SafeMath: multiplication overflow");
-
-        return c;
-    }
-
-    /**
-     * @dev Returns the integer division of two unsigned integers. Reverts on
-     * division by zero. The result is rounded towards zero.
-     *
-     * Counterpart to Solidity's `/` operator. Note: this function uses a
-     * `revert` opcode (which leaves remaining gas untouched) while Solidity
-     * uses an invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        return div(a, b, "SafeMath: division by zero");
-    }
-
-    /**
-     * @dev Returns the integer division of two unsigned integers. Reverts with custom message on
-     * division by zero. The result is rounded towards zero.
-     *
-     * Counterpart to Solidity's `/` operator. Note: this function uses a
-     * `revert` opcode (which leaves remaining gas untouched) while Solidity
-     * uses an invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
-        require(b > 0, errorMessage);
-        uint256 c = a / b;
-        // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-
-        return c;
-    }
-
-    /**
-     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-     * Reverts when dividing by zero.
-     *
-     * Counterpart to Solidity's `%` operator. This function uses a `revert`
-     * opcode (which leaves remaining gas untouched) while Solidity uses an
-     * invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
-        return mod(a, b, "SafeMath: modulo by zero");
-    }
-
-    /**
-     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-     * Reverts with custom message when dividing by zero.
-     *
-     * Counterpart to Solidity's `%` operator. This function uses a `revert`
-     * opcode (which leaves remaining gas untouched) while Solidity uses an
-     * invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
-        require(b != 0, errorMessage);
-        return a % b;
-    }
-}
-
-
-
-
+pragma solidity ^0.6.0;
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP.
@@ -1870,45 +1714,1023 @@ interface IERC20 {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
+// File: @chainlink/contracts/src/v0.6/vendor/Buffer.sol
 
-//TODO Do we want console.log logging, start with Activity constructor?..
+pragma solidity ^0.6.0;
 
-contract SinglePlayerCommit is Ownable {
-    using SafeMath for uint256;
+/**
+* @dev A library for working with mutable byte buffers in Solidity.
+*
+* Byte buffers are mutable and expandable, and provide a variety of primitives
+* for writing to them. At any time you can fetch a bytes object containing the
+* current contents of the buffer. The bytes object should not be stored between
+* operations, as it may change due to resizing of the buffer.
+*/
+library Buffer {
+  /**
+  * @dev Represents a mutable buffer. Buffers have a current value (buf) and
+  *      a capacity. The capacity may be longer than the current value, in
+  *      which case it can be extended without the need to allocate more memory.
+  */
+  struct buffer {
+    bytes buf;
+    uint capacity;
+  }
+
+  /**
+  * @dev Initializes a buffer with an initial capacity.
+  * @param buf The buffer to initialize.
+  * @param capacity The number of bytes of space to allocate the buffer.
+  * @return The buffer, for chaining.
+  */
+  function init(buffer memory buf, uint capacity) internal pure returns(buffer memory) {
+    if (capacity % 32 != 0) {
+      capacity += 32 - (capacity % 32);
+    }
+    // Allocate space for the buffer data
+    buf.capacity = capacity;
+    assembly {
+      let ptr := mload(0x40)
+      mstore(buf, ptr)
+      mstore(ptr, 0)
+      mstore(0x40, add(32, add(ptr, capacity)))
+    }
+    return buf;
+  }
+
+  /**
+  * @dev Initializes a new buffer from an existing bytes object.
+  *      Changes to the buffer may mutate the original value.
+  * @param b The bytes object to initialize the buffer with.
+  * @return A new buffer.
+  */
+  function fromBytes(bytes memory b) internal pure returns(buffer memory) {
+    buffer memory buf;
+    buf.buf = b;
+    buf.capacity = b.length;
+    return buf;
+  }
+
+  function resize(buffer memory buf, uint capacity) private pure {
+    bytes memory oldbuf = buf.buf;
+    init(buf, capacity);
+    append(buf, oldbuf);
+  }
+
+  function max(uint a, uint b) private pure returns(uint) {
+    if (a > b) {
+      return a;
+    }
+    return b;
+  }
+
+  /**
+  * @dev Sets buffer length to 0.
+  * @param buf The buffer to truncate.
+  * @return The original buffer, for chaining..
+  */
+  function truncate(buffer memory buf) internal pure returns (buffer memory) {
+    assembly {
+      let bufptr := mload(buf)
+      mstore(bufptr, 0)
+    }
+    return buf;
+  }
+
+  /**
+  * @dev Writes a byte string to a buffer. Resizes if doing so would exceed
+  *      the capacity of the buffer.
+  * @param buf The buffer to append to.
+  * @param off The start offset to write to.
+  * @param data The data to append.
+  * @param len The number of bytes to copy.
+  * @return The original buffer, for chaining.
+  */
+  function write(buffer memory buf, uint off, bytes memory data, uint len) internal pure returns(buffer memory) {
+    require(len <= data.length);
+
+    if (off + len > buf.capacity) {
+      resize(buf, max(buf.capacity, len + off) * 2);
+    }
+
+    uint dest;
+    uint src;
+    assembly {
+      // Memory address of the buffer data
+      let bufptr := mload(buf)
+      // Length of existing buffer data
+      let buflen := mload(bufptr)
+      // Start address = buffer address + offset + sizeof(buffer length)
+      dest := add(add(bufptr, 32), off)
+      // Update buffer length if we're extending it
+      if gt(add(len, off), buflen) {
+        mstore(bufptr, add(len, off))
+      }
+      src := add(data, 32)
+    }
+
+    // Copy word-length chunks while possible
+    for (; len >= 32; len -= 32) {
+      assembly {
+        mstore(dest, mload(src))
+      }
+      dest += 32;
+      src += 32;
+    }
+
+    // Copy remaining bytes
+    uint mask = 256 ** (32 - len) - 1;
+    assembly {
+      let srcpart := and(mload(src), not(mask))
+      let destpart := and(mload(dest), mask)
+      mstore(dest, or(destpart, srcpart))
+    }
+
+    return buf;
+  }
+
+  /**
+  * @dev Appends a byte string to a buffer. Resizes if doing so would exceed
+  *      the capacity of the buffer.
+  * @param buf The buffer to append to.
+  * @param data The data to append.
+  * @param len The number of bytes to copy.
+  * @return The original buffer, for chaining.
+  */
+  function append(buffer memory buf, bytes memory data, uint len) internal pure returns (buffer memory) {
+    return write(buf, buf.buf.length, data, len);
+  }
+
+  /**
+  * @dev Appends a byte string to a buffer. Resizes if doing so would exceed
+  *      the capacity of the buffer.
+  * @param buf The buffer to append to.
+  * @param data The data to append.
+  * @return The original buffer, for chaining.
+  */
+  function append(buffer memory buf, bytes memory data) internal pure returns (buffer memory) {
+    return write(buf, buf.buf.length, data, data.length);
+  }
+
+  /**
+  * @dev Writes a byte to the buffer. Resizes if doing so would exceed the
+  *      capacity of the buffer.
+  * @param buf The buffer to append to.
+  * @param off The offset to write the byte at.
+  * @param data The data to append.
+  * @return The original buffer, for chaining.
+  */
+  function writeUint8(buffer memory buf, uint off, uint8 data) internal pure returns(buffer memory) {
+    if (off >= buf.capacity) {
+      resize(buf, buf.capacity * 2);
+    }
+
+    assembly {
+      // Memory address of the buffer data
+      let bufptr := mload(buf)
+      // Length of existing buffer data
+      let buflen := mload(bufptr)
+      // Address = buffer address + sizeof(buffer length) + off
+      let dest := add(add(bufptr, off), 32)
+      mstore8(dest, data)
+      // Update buffer length if we extended it
+      if eq(off, buflen) {
+        mstore(bufptr, add(buflen, 1))
+      }
+    }
+    return buf;
+  }
+
+  /**
+  * @dev Appends a byte to the buffer. Resizes if doing so would exceed the
+  *      capacity of the buffer.
+  * @param buf The buffer to append to.
+  * @param data The data to append.
+  * @return The original buffer, for chaining.
+  */
+  function appendUint8(buffer memory buf, uint8 data) internal pure returns(buffer memory) {
+    return writeUint8(buf, buf.buf.length, data);
+  }
+
+  /**
+  * @dev Writes up to 32 bytes to the buffer. Resizes if doing so would
+  *      exceed the capacity of the buffer.
+  * @param buf The buffer to append to.
+  * @param off The offset to write at.
+  * @param data The data to append.
+  * @param len The number of bytes to write (left-aligned).
+  * @return The original buffer, for chaining.
+  */
+  function write(buffer memory buf, uint off, bytes32 data, uint len) private pure returns(buffer memory) {
+    if (len + off > buf.capacity) {
+      resize(buf, (len + off) * 2);
+    }
+
+    uint mask = 256 ** len - 1;
+    // Right-align data
+    data = data >> (8 * (32 - len));
+    assembly {
+      // Memory address of the buffer data
+      let bufptr := mload(buf)
+      // Address = buffer address + sizeof(buffer length) + off + len
+      let dest := add(add(bufptr, off), len)
+      mstore(dest, or(and(mload(dest), not(mask)), data))
+      // Update buffer length if we extended it
+      if gt(add(off, len), mload(bufptr)) {
+        mstore(bufptr, add(off, len))
+      }
+    }
+    return buf;
+  }
+
+  /**
+  * @dev Writes a bytes20 to the buffer. Resizes if doing so would exceed the
+  *      capacity of the buffer.
+  * @param buf The buffer to append to.
+  * @param off The offset to write at.
+  * @param data The data to append.
+  * @return The original buffer, for chaining.
+  */
+  function writeBytes20(buffer memory buf, uint off, bytes20 data) internal pure returns (buffer memory) {
+    return write(buf, off, bytes32(data), 20);
+  }
+
+  /**
+  * @dev Appends a bytes20 to the buffer. Resizes if doing so would exceed
+  *      the capacity of the buffer.
+  * @param buf The buffer to append to.
+  * @param data The data to append.
+  * @return The original buffer, for chhaining.
+  */
+  function appendBytes20(buffer memory buf, bytes20 data) internal pure returns (buffer memory) {
+    return write(buf, buf.buf.length, bytes32(data), 20);
+  }
+
+  /**
+  * @dev Appends a bytes32 to the buffer. Resizes if doing so would exceed
+  *      the capacity of the buffer.
+  * @param buf The buffer to append to.
+  * @param data The data to append.
+  * @return The original buffer, for chaining.
+  */
+  function appendBytes32(buffer memory buf, bytes32 data) internal pure returns (buffer memory) {
+    return write(buf, buf.buf.length, data, 32);
+  }
+
+  /**
+  * @dev Writes an integer to the buffer. Resizes if doing so would exceed
+  *      the capacity of the buffer.
+  * @param buf The buffer to append to.
+  * @param off The offset to write at.
+  * @param data The data to append.
+  * @param len The number of bytes to write (right-aligned).
+  * @return The original buffer, for chaining.
+  */
+  function writeInt(buffer memory buf, uint off, uint data, uint len) private pure returns(buffer memory) {
+    if (len + off > buf.capacity) {
+      resize(buf, (len + off) * 2);
+    }
+
+    uint mask = 256 ** len - 1;
+    assembly {
+      // Memory address of the buffer data
+      let bufptr := mload(buf)
+      // Address = buffer address + off + sizeof(buffer length) + len
+      let dest := add(add(bufptr, off), len)
+      mstore(dest, or(and(mload(dest), not(mask)), data))
+      // Update buffer length if we extended it
+      if gt(add(off, len), mload(bufptr)) {
+        mstore(bufptr, add(off, len))
+      }
+    }
+    return buf;
+  }
+
+  /**
+    * @dev Appends a byte to the end of the buffer. Resizes if doing so would
+    * exceed the capacity of the buffer.
+    * @param buf The buffer to append to.
+    * @param data The data to append.
+    * @return The original buffer.
+    */
+  function appendInt(buffer memory buf, uint data, uint len) internal pure returns(buffer memory) {
+    return writeInt(buf, buf.buf.length, data, len);
+  }
+}
+
+// File: @chainlink/contracts/src/v0.6/vendor/CBOR.sol
+
+pragma solidity ^0.6.0;
+
+
+library CBOR {
+  using Buffer_Chainlink for Buffer_Chainlink.buffer;
+
+  uint8 private constant MAJOR_TYPE_INT = 0;
+  uint8 private constant MAJOR_TYPE_NEGATIVE_INT = 1;
+  uint8 private constant MAJOR_TYPE_BYTES = 2;
+  uint8 private constant MAJOR_TYPE_STRING = 3;
+  uint8 private constant MAJOR_TYPE_ARRAY = 4;
+  uint8 private constant MAJOR_TYPE_MAP = 5;
+  uint8 private constant MAJOR_TYPE_CONTENT_FREE = 7;
+
+  function encodeType(Buffer_Chainlink.buffer memory buf, uint8 major, uint value) private pure {
+    if(value <= 23) {
+      buf.appendUint8(uint8((major << 5) | value));
+    } else if(value <= 0xFF) {
+      buf.appendUint8(uint8((major << 5) | 24));
+      buf.appendInt(value, 1);
+    } else if(value <= 0xFFFF) {
+      buf.appendUint8(uint8((major << 5) | 25));
+      buf.appendInt(value, 2);
+    } else if(value <= 0xFFFFFFFF) {
+      buf.appendUint8(uint8((major << 5) | 26));
+      buf.appendInt(value, 4);
+    } else if(value <= 0xFFFFFFFFFFFFFFFF) {
+      buf.appendUint8(uint8((major << 5) | 27));
+      buf.appendInt(value, 8);
+    }
+  }
+
+  function encodeIndefiniteLengthType(Buffer_Chainlink.buffer memory buf, uint8 major) private pure {
+    buf.appendUint8(uint8((major << 5) | 31));
+  }
+
+  function encodeUInt(Buffer_Chainlink.buffer memory buf, uint value) internal pure {
+    encodeType(buf, MAJOR_TYPE_INT, value);
+  }
+
+  function encodeInt(Buffer_Chainlink.buffer memory buf, int value) internal pure {
+    if(value >= 0) {
+      encodeType(buf, MAJOR_TYPE_INT, uint(value));
+    } else {
+      encodeType(buf, MAJOR_TYPE_NEGATIVE_INT, uint(-1 - value));
+    }
+  }
+
+  function encodeBytes(Buffer_Chainlink.buffer memory buf, bytes memory value) internal pure {
+    encodeType(buf, MAJOR_TYPE_BYTES, value.length);
+    buf.append(value);
+  }
+
+  function encodeString(Buffer_Chainlink.buffer memory buf, string memory value) internal pure {
+    encodeType(buf, MAJOR_TYPE_STRING, bytes(value).length);
+    buf.append(bytes(value));
+  }
+
+  function startArray(Buffer_Chainlink.buffer memory buf) internal pure {
+    encodeIndefiniteLengthType(buf, MAJOR_TYPE_ARRAY);
+  }
+
+  function startMap(Buffer_Chainlink.buffer memory buf) internal pure {
+    encodeIndefiniteLengthType(buf, MAJOR_TYPE_MAP);
+  }
+
+  function endSequence(Buffer_Chainlink.buffer memory buf) internal pure {
+    encodeIndefiniteLengthType(buf, MAJOR_TYPE_CONTENT_FREE);
+  }
+}
+
+// File: @chainlink/contracts/src/v0.6/Chainlink.sol
+
+pragma solidity ^0.6.0;
+
+
+
+/**
+ * @title Library for common Chainlink functions
+ * @dev Uses imported CBOR library for encoding to buffer
+ */
+library Chainlink {
+  uint256 internal constant defaultBufferSize = 256; // solhint-disable-line const-name-snakecase
+
+  using CBOR_Chainlink for Buffer_Chainlink.buffer;
+
+  struct Request {
+    bytes32 id;
+    address callbackAddress;
+    bytes4 callbackFunctionId;
+    uint256 nonce;
+    Buffer_Chainlink.buffer buf;
+  }
+
+  /**
+   * @notice Initializes a Chainlink request
+   * @dev Sets the ID, callback address, and callback function signature on the request
+   * @param self The uninitialized request
+   * @param _id The Job Specification ID
+   * @param _callbackAddress The callback address
+   * @param _callbackFunction The callback function signature
+   * @return The initialized request
+   */
+  function initialize(
+    Request memory self,
+    bytes32 _id,
+    address _callbackAddress,
+    bytes4 _callbackFunction
+  ) internal pure returns (Chainlink.Request memory) {
+    Buffer_Chainlink.init(self.buf, defaultBufferSize);
+    self.id = _id;
+    self.callbackAddress = _callbackAddress;
+    self.callbackFunctionId = _callbackFunction;
+    return self;
+  }
+
+  /**
+   * @notice Sets the data for the buffer without encoding CBOR on-chain
+   * @dev CBOR can be closed with curly-brackets {} or they can be left off
+   * @param self The initialized request
+   * @param _data The CBOR data
+   */
+  function setBuffer(Request memory self, bytes memory _data)
+    internal pure
+  {
+    Buffer_Chainlink.init(self.buf, _data.length);
+    Buffer_Chainlink.append(self.buf, _data);
+  }
+
+  /**
+   * @notice Adds a string value to the request with a given key name
+   * @param self The initialized request
+   * @param _key The name of the key
+   * @param _value The string value to add
+   */
+  function add(Request memory self, string memory _key, string memory _value)
+    internal pure
+  {
+    self.buf.encodeString(_key);
+    self.buf.encodeString(_value);
+  }
+
+  /**
+   * @notice Adds a bytes value to the request with a given key name
+   * @param self The initialized request
+   * @param _key The name of the key
+   * @param _value The bytes value to add
+   */
+  function addBytes(Request memory self, string memory _key, bytes memory _value)
+    internal pure
+  {
+    self.buf.encodeString(_key);
+    self.buf.encodeBytes(_value);
+  }
+
+  /**
+   * @notice Adds a int256 value to the request with a given key name
+   * @param self The initialized request
+   * @param _key The name of the key
+   * @param _value The int256 value to add
+   */
+  function addInt(Request memory self, string memory _key, int256 _value)
+    internal pure
+  {
+    self.buf.encodeString(_key);
+    self.buf.encodeInt(_value);
+  }
+
+  /**
+   * @notice Adds a uint256 value to the request with a given key name
+   * @param self The initialized request
+   * @param _key The name of the key
+   * @param _value The uint256 value to add
+   */
+  function addUint(Request memory self, string memory _key, uint256 _value)
+    internal pure
+  {
+    self.buf.encodeString(_key);
+    self.buf.encodeUInt(_value);
+  }
+
+  /**
+   * @notice Adds an array of strings to the request with a given key name
+   * @param self The initialized request
+   * @param _key The name of the key
+   * @param _values The array of string values to add
+   */
+  function addStringArray(Request memory self, string memory _key, string[] memory _values)
+    internal pure
+  {
+    self.buf.encodeString(_key);
+    self.buf.startArray();
+    for (uint256 i = 0; i < _values.length; i++) {
+      self.buf.encodeString(_values[i]);
+    }
+    self.buf.endSequence();
+  }
+}
+
+// File: @chainlink/contracts/src/v0.6/interfaces/ENSInterface.sol
+
+pragma solidity ^0.6.0;
+
+interface ENSInterface {
+
+  // Logged when the owner of a node assigns a new owner to a subnode.
+  event NewOwner(bytes32 indexed node, bytes32 indexed label, address owner);
+
+  // Logged when the owner of a node transfers ownership to a new account.
+  event Transfer(bytes32 indexed node, address owner);
+
+  // Logged when the resolver for a node changes.
+  event NewResolver(bytes32 indexed node, address resolver);
+
+  // Logged when the TTL of a node changes
+  event NewTTL(bytes32 indexed node, uint64 ttl);
+
+
+  function setSubnodeOwner(bytes32 node, bytes32 label, address _owner) external;
+  function setResolver(bytes32 node, address _resolver) external;
+  function setOwner(bytes32 node, address _owner) external;
+  function setTTL(bytes32 node, uint64 _ttl) external;
+  function owner(bytes32 node) external view returns (address);
+  function resolver(bytes32 node) external view returns (address);
+  function ttl(bytes32 node) external view returns (uint64);
+
+}
+
+// File: @chainlink/contracts/src/v0.6/interfaces/LinkTokenInterface.sol
+
+pragma solidity ^0.6.0;
+
+interface LinkTokenInterface {
+  function allowance(address owner, address spender) external view returns (uint256 remaining);
+  function approve(address spender, uint256 value) external returns (bool success);
+  function balanceOf(address owner) external view returns (uint256 balance);
+  function decimals() external view returns (uint8 decimalPlaces);
+  function decreaseApproval(address spender, uint256 addedValue) external returns (bool success);
+  function increaseApproval(address spender, uint256 subtractedValue) external;
+  function name() external view returns (string memory tokenName);
+  function symbol() external view returns (string memory tokenSymbol);
+  function totalSupply() external view returns (uint256 totalTokensIssued);
+  function transfer(address to, uint256 value) external returns (bool success);
+  function transferAndCall(address to, uint256 value, bytes calldata data) external returns (bool success);
+  function transferFrom(address from, address to, uint256 value) external returns (bool success);
+}
+
+// File: @chainlink/contracts/src/v0.6/interfaces/ChainlinkRequestInterface.sol
+
+pragma solidity ^0.6.0;
+
+interface ChainlinkRequestInterface {
+  function oracleRequest(
+    address sender,
+    uint256 requestPrice,
+    bytes32 serviceAgreementID,
+    address callbackAddress,
+    bytes4 callbackFunctionId,
+    uint256 nonce,
+    uint256 dataVersion, // Currently unused, always "1"
+    bytes calldata data
+  ) external;
+
+  function cancelOracleRequest(
+    bytes32 requestId,
+    uint256 payment,
+    bytes4 callbackFunctionId,
+    uint256 expiration
+  ) external;
+}
+
+// File: @chainlink/contracts/src/v0.6/interfaces/PointerInterface.sol
+
+pragma solidity ^0.6.0;
+
+interface PointerInterface {
+  function getAddress() external view returns (address);
+}
+
+// File: @chainlink/contracts/src/v0.6/vendor/ENSResolver.sol
+
+pragma solidity ^0.6.0;
+
+abstract contract ENSResolver {
+  function addr(bytes32 node) public view virtual returns (address);
+}
+
+// File: @chainlink/contracts/src/v0.6/vendor/SafeMath.sol
+
+pragma solidity ^0.6.0;
+
+/**
+ * @dev Wrappers over Solidity's arithmetic operations with added overflow
+ * checks.
+ *
+ * Arithmetic operations in Solidity wrap on overflow. This can easily result
+ * in bugs, because programmers usually assume that an overflow raises an
+ * error, which is the standard behavior in high level programming languages.
+ * `SafeMath` restores this intuition by reverting the transaction when an
+ * operation overflows.
+ *
+ * Using this library instead of the unchecked operations eliminates an entire
+ * class of bugs, so it's recommended to use it always.
+ */
+library SafeMath {
+  /**
+    * @dev Returns the addition of two unsigned integers, reverting on
+    * overflow.
+    *
+    * Counterpart to Solidity's `+` operator.
+    *
+    * Requirements:
+    * - Addition cannot overflow.
+    */
+  function add(uint256 a, uint256 b) internal pure returns (uint256) {
+    uint256 c = a + b;
+    require(c >= a, "SafeMath: addition overflow");
+
+    return c;
+  }
+
+  /**
+    * @dev Returns the subtraction of two unsigned integers, reverting on
+    * overflow (when the result is negative).
+    *
+    * Counterpart to Solidity's `-` operator.
+    *
+    * Requirements:
+    * - Subtraction cannot overflow.
+    */
+  function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+    require(b <= a, "SafeMath: subtraction overflow");
+    uint256 c = a - b;
+
+    return c;
+  }
+
+  /**
+    * @dev Returns the multiplication of two unsigned integers, reverting on
+    * overflow.
+    *
+    * Counterpart to Solidity's `*` operator.
+    *
+    * Requirements:
+    * - Multiplication cannot overflow.
+    */
+  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+    // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
+    // benefit is lost if 'b' is also tested.
+    // See: https://github.com/OpenZeppelin/openzeppelin-solidity/pull/522
+    if (a == 0) {
+      return 0;
+    }
+
+    uint256 c = a * b;
+    require(c / a == b, "SafeMath: multiplication overflow");
+
+    return c;
+  }
+
+  /**
+    * @dev Returns the integer division of two unsigned integers. Reverts on
+    * division by zero. The result is rounded towards zero.
+    *
+    * Counterpart to Solidity's `/` operator. Note: this function uses a
+    * `revert` opcode (which leaves remaining gas untouched) while Solidity
+    * uses an invalid opcode to revert (consuming all remaining gas).
+    *
+    * Requirements:
+    * - The divisor cannot be zero.
+    */
+  function div(uint256 a, uint256 b) internal pure returns (uint256) {
+    // Solidity only automatically asserts when dividing by 0
+    require(b > 0, "SafeMath: division by zero");
+    uint256 c = a / b;
+    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+
+    return c;
+  }
+
+  /**
+    * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+    * Reverts when dividing by zero.
+    *
+    * Counterpart to Solidity's `%` operator. This function uses a `revert`
+    * opcode (which leaves remaining gas untouched) while Solidity uses an
+    * invalid opcode to revert (consuming all remaining gas).
+    *
+    * Requirements:
+    * - The divisor cannot be zero.
+    */
+  function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+    require(b != 0, "SafeMath: modulo by zero");
+    return a % b;
+  }
+}
+
+// File: @chainlink/contracts/src/v0.6/ChainlinkClient.sol
+
+pragma solidity ^0.6.0;
+
+
+
+
+
+
+
+
+/**
+ * @title The ChainlinkClient contract
+ * @notice Contract writers can inherit this contract in order to create requests for the
+ * Chainlink network
+ */
+contract ChainlinkClient {
+  using Chainlink for Chainlink.Request;
+  using SafeMath_Chainlink for uint256;
+
+  uint256 constant internal LINK = 10**18;
+  uint256 constant private AMOUNT_OVERRIDE = 0;
+  address constant private SENDER_OVERRIDE = address(0);
+  uint256 constant private ARGS_VERSION = 1;
+  bytes32 constant private ENS_TOKEN_SUBNAME = keccak256("link");
+  bytes32 constant private ENS_ORACLE_SUBNAME = keccak256("oracle");
+  address constant private LINK_TOKEN_POINTER = 0xC89bD4E1632D3A43CB03AAAd5262cbe4038Bc571;
+
+  ENSInterface private ens;
+  bytes32 private ensNode;
+  LinkTokenInterface private link;
+  ChainlinkRequestInterface private oracle;
+  uint256 private requestCount = 1;
+  mapping(bytes32 => address) private pendingRequests;
+
+  event ChainlinkRequested(bytes32 indexed id);
+  event ChainlinkFulfilled(bytes32 indexed id);
+  event ChainlinkCancelled(bytes32 indexed id);
+
+  /**
+   * @notice Creates a request that can hold additional parameters
+   * @param _specId The Job Specification ID that the request will be created for
+   * @param _callbackAddress The callback address that the response will be sent to
+   * @param _callbackFunctionSignature The callback function signature to use for the callback address
+   * @return A Chainlink Request struct in memory
+   */
+  function buildChainlinkRequest(
+    bytes32 _specId,
+    address _callbackAddress,
+    bytes4 _callbackFunctionSignature
+  ) internal pure returns (Chainlink.Request memory) {
+    Chainlink.Request memory req;
+    return req.initialize(_specId, _callbackAddress, _callbackFunctionSignature);
+  }
+
+  /**
+   * @notice Creates a Chainlink request to the stored oracle address
+   * @dev Calls `chainlinkRequestTo` with the stored oracle address
+   * @param _req The initialized Chainlink Request
+   * @param _payment The amount of LINK to send for the request
+   * @return requestId The request ID
+   */
+  function sendChainlinkRequest(Chainlink.Request memory _req, uint256 _payment)
+    internal
+    returns (bytes32)
+  {
+    return sendChainlinkRequestTo(address(oracle), _req, _payment);
+  }
+
+  /**
+   * @notice Creates a Chainlink request to the specified oracle address
+   * @dev Generates and stores a request ID, increments the local nonce, and uses `transferAndCall` to
+   * send LINK which creates a request on the target oracle contract.
+   * Emits ChainlinkRequested event.
+   * @param _oracle The address of the oracle for the request
+   * @param _req The initialized Chainlink Request
+   * @param _payment The amount of LINK to send for the request
+   * @return requestId The request ID
+   */
+  function sendChainlinkRequestTo(address _oracle, Chainlink.Request memory _req, uint256 _payment)
+    internal
+    returns (bytes32 requestId)
+  {
+    requestId = keccak256(abi.encodePacked(this, requestCount));
+    _req.nonce = requestCount;
+    pendingRequests[requestId] = _oracle;
+    emit ChainlinkRequested(requestId);
+    require(link.transferAndCall(_oracle, _payment, encodeRequest(_req)), "unable to transferAndCall to oracle");
+    requestCount += 1;
+
+    return requestId;
+  }
+
+  /**
+   * @notice Allows a request to be cancelled if it has not been fulfilled
+   * @dev Requires keeping track of the expiration value emitted from the oracle contract.
+   * Deletes the request from the `pendingRequests` mapping.
+   * Emits ChainlinkCancelled event.
+   * @param _requestId The request ID
+   * @param _payment The amount of LINK sent for the request
+   * @param _callbackFunc The callback function specified for the request
+   * @param _expiration The time of the expiration for the request
+   */
+  function cancelChainlinkRequest(
+    bytes32 _requestId,
+    uint256 _payment,
+    bytes4 _callbackFunc,
+    uint256 _expiration
+  )
+    internal
+  {
+    ChainlinkRequestInterface requested = ChainlinkRequestInterface(pendingRequests[_requestId]);
+    delete pendingRequests[_requestId];
+    emit ChainlinkCancelled(_requestId);
+    requested.cancelOracleRequest(_requestId, _payment, _callbackFunc, _expiration);
+  }
+
+  /**
+   * @notice Sets the stored oracle address
+   * @param _oracle The address of the oracle contract
+   */
+  function setChainlinkOracle(address _oracle) internal {
+    oracle = ChainlinkRequestInterface(_oracle);
+  }
+
+  /**
+   * @notice Sets the LINK token address
+   * @param _link The address of the LINK token contract
+   */
+  function setChainlinkToken(address _link) internal {
+    link = LinkTokenInterface(_link);
+  }
+
+  /**
+   * @notice Sets the Chainlink token address for the public
+   * network as given by the Pointer contract
+   */
+  function setPublicChainlinkToken() internal {
+    setChainlinkToken(PointerInterface(LINK_TOKEN_POINTER).getAddress());
+  }
+
+  /**
+   * @notice Retrieves the stored address of the LINK token
+   * @return The address of the LINK token
+   */
+  function chainlinkTokenAddress()
+    internal
+    view
+    returns (address)
+  {
+    return address(link);
+  }
+
+  /**
+   * @notice Retrieves the stored address of the oracle contract
+   * @return The address of the oracle contract
+   */
+  function chainlinkOracleAddress()
+    internal
+    view
+    returns (address)
+  {
+    return address(oracle);
+  }
+
+  /**
+   * @notice Allows for a request which was created on another contract to be fulfilled
+   * on this contract
+   * @param _oracle The address of the oracle contract that will fulfill the request
+   * @param _requestId The request ID used for the response
+   */
+  function addChainlinkExternalRequest(address _oracle, bytes32 _requestId)
+    internal
+    notPendingRequest(_requestId)
+  {
+    pendingRequests[_requestId] = _oracle;
+  }
+
+  /**
+   * @notice Sets the stored oracle and LINK token contracts with the addresses resolved by ENS
+   * @dev Accounts for subnodes having different resolvers
+   * @param _ens The address of the ENS contract
+   * @param _node The ENS node hash
+   */
+  function useChainlinkWithENS(address _ens, bytes32 _node)
+    internal
+  {
+    ens = ENSInterface(_ens);
+    ensNode = _node;
+    bytes32 linkSubnode = keccak256(abi.encodePacked(ensNode, ENS_TOKEN_SUBNAME));
+    ENSResolver_Chainlink resolver = ENSResolver_Chainlink(ens.resolver(linkSubnode));
+    setChainlinkToken(resolver.addr(linkSubnode));
+    updateChainlinkOracleWithENS();
+  }
+
+  /**
+   * @notice Sets the stored oracle contract with the address resolved by ENS
+   * @dev This may be called on its own as long as `useChainlinkWithENS` has been called previously
+   */
+  function updateChainlinkOracleWithENS()
+    internal
+  {
+    bytes32 oracleSubnode = keccak256(abi.encodePacked(ensNode, ENS_ORACLE_SUBNAME));
+    ENSResolver_Chainlink resolver = ENSResolver_Chainlink(ens.resolver(oracleSubnode));
+    setChainlinkOracle(resolver.addr(oracleSubnode));
+  }
+
+  /**
+   * @notice Encodes the request to be sent to the oracle contract
+   * @dev The Chainlink node expects values to be in order for the request to be picked up. Order of types
+   * will be validated in the oracle contract.
+   * @param _req The initialized Chainlink Request
+   * @return The bytes payload for the `transferAndCall` method
+   */
+  function encodeRequest(Chainlink.Request memory _req)
+    private
+    view
+    returns (bytes memory)
+  {
+    return abi.encodeWithSelector(
+      oracle.oracleRequest.selector,
+      SENDER_OVERRIDE, // Sender value - overridden by onTokenTransfer by the requesting contract's address
+      AMOUNT_OVERRIDE, // Amount value - overridden by onTokenTransfer by the actual amount of LINK sent
+      _req.id,
+      _req.callbackAddress,
+      _req.callbackFunctionId,
+      _req.nonce,
+      ARGS_VERSION,
+      _req.buf.buf);
+  }
+
+  /**
+   * @notice Ensures that the fulfillment is valid for this contract
+   * @dev Use if the contract developer prefers methods instead of modifiers for validation
+   * @param _requestId The request ID for fulfillment
+   */
+  function validateChainlinkCallback(bytes32 _requestId)
+    internal
+    recordChainlinkFulfillment(_requestId)
+    // solhint-disable-next-line no-empty-blocks
+  {}
+
+  /**
+   * @dev Reverts if the sender is not the oracle of the request.
+   * Emits ChainlinkFulfilled event.
+   * @param _requestId The request ID for fulfillment
+   */
+  modifier recordChainlinkFulfillment(bytes32 _requestId) {
+    require(msg.sender == pendingRequests[_requestId],
+            "Source must be the oracle of the request");
+    delete pendingRequests[_requestId];
+    emit ChainlinkFulfilled(_requestId);
+    _;
+  }
+
+  /**
+   * @dev Reverts if the request is already pending
+   * @param _requestId The request ID for fulfillment
+   */
+  modifier notPendingRequest(bytes32 _requestId) {
+    require(pendingRequests[_requestId] == address(0), "Request is already pending");
+    _;
+  }
+}
+
+// File: contracts/SinglePlayerCommit.sol
+
+/* SPDX-License-Identifier: MIT */
+pragma solidity ^0.6.10;
+pragma experimental ABIEncoderV2;
+
+
+// import "@openzeppelin/contracts/math/SafeMath.sol";
+
+
+//https://github.com/smartcontractkit/chainlink/issues/3153#issuecomment-655241638
+
+
+
+/// @title CommitPool single-player mode contract
+/// @notice Enables staking and validating performance. No social/pool functionality.
+contract SinglePlayerCommit is ChainlinkClient, Ownable {
+    using SafeMath_Chainlink for uint256;
 
     /******************
     GLOBAL CONSTANTS
     ******************/
     IERC20 public token;
     uint256 BIGGEST_NUMBER = uint256(-1);
+    uint256 constant private ORACLE_PAYMENT = 1 * LINK;
 
     /***************
     DATA TYPES
     ***************/
-    struct Measure {
-        string name;
-        bool allowed;
-    }
-
+    /// @notice Activity as part of commitment with oracle address. E.g. "cycling" with ChainLink Strava node 
     struct Activity {
-        string name; // e.g. "cycling"
-        bytes32[] measures; // keys from allowedMeasures
-        uint256[2][] ranges; // array of [min,max] goal values
+        string name;
         address oracle;
         bool allowed;
+        bool exists;
     }
 
     struct Commitment {
         address committer; // user
-        bytes32 activity; // key from allowedActivities
-        bytes32 measure; // key from allowedMeasures
-        uint256 goalValue; // must be within range of Activity.measures[measureIndex]
-        uint256 start;
-        uint256 end;
+        bytes32 activityKey;
+        uint256 goalValue;
+        uint256 startTime;
+        uint256 endTime;
         uint256 stake; // amount of token staked, scaled by token decimals
-        bool exists; // flag to help check if commitment exists
         uint256 reportedValue; // as reported by oracle
+        uint256 lastActivityUpdate; // when updated by oracle
         bool met; // whether the commitment has been met
+        string userId;
+        bool exists; // flag to help check if commitment exists
     }
 
     /***************
@@ -1916,8 +2738,8 @@ contract SinglePlayerCommit is Ownable {
     ***************/
     event NewCommitment(
         address committer,
-        string activity,
-        string measure,
+        string activityName,
+        uint256 goalValue,
         uint256 startTime,
         uint256 endTime,
         uint256 stake
@@ -1925,102 +2747,74 @@ contract SinglePlayerCommit is Ownable {
     event CommitmentEnded(address committer, bool met, uint256 amountPenalized);
     event Deposit(address committer, uint256 amount);
     event Withdrawal(address committer, uint256 amount);
+    event RequestActivityDistanceFulfilled(
+        bytes32 indexed requestId,
+        uint256 indexed distance
+    );
+    event ActivityUpdated(
+        string name, 
+        bytes32 activityKey, 
+        address oracle, 
+        bool allowed,
+        bool exists);
+    //TODO Error events
+
 
     /******************
     INTERNAL ACCOUNTING
     ******************/
-    mapping(bytes32 => Activity) public allowedActivities;
-    bytes32[] public activityList;
-
-    mapping(bytes32 => Measure) public allowedMeasures;
-    bytes32[] public measureList;
+    mapping(bytes32 => Activity) public activities; // get Activity object based on activity key
+    bytes32[] public activityKeyList; // List of activityKeys, used for indexing allowed activities
 
     mapping(address => Commitment) public commitments; // active commitments
-    // address[] public committers; // addresses with active commitments
+    // address[] public userCommitments; // addresses with active commitments
 
-    mapping(address => uint256) public balances; // current token balances
-    uint256 public committerBalance; // sum of current token balances
+    mapping(address => uint256) public committerBalances; // current token balances per user
+    uint256 public totalCommitterBalance; // sum of current token balances
+    uint256 public slashedBalance; //sum of all slashed balances
+
+    mapping(bytes32 => address) public jobAddresses; // holds the address that ran the job
 
     /********
     FUNCTIONS
     ********/
-    // constructor
+    /// @notice Contract constructor used during deployment
+    /// @param _activityList String list of activities reported by oracle
+    /// @param _oracleAddress Address of oracle for activity data
+    /// @param _token Address of <token> contract
+    /// @dev Configure token address, add activities to activities mapping by calling _addActivities method
     constructor(
-        string memory _activity,
-        string[] memory _measures,
-        uint256[2][] memory _ranges,
-        address _oracle,
+        string[] memory _activityList,
+        address _oracleAddress,
         address _token
-    ) public {
-        console.log("Constructor called for SinglePlayerCommit contract");
-        // set up token interface
-        token = IERC20(_token);
+    ) 
+        public {
+            console.log("Constructor called for SinglePlayerCommit contract");
+            require(_activityList.length >= 1, "SPC::constructor - activityList empty");
+            token = IERC20(_token);
 
-        // need to create fixed length bytes32 array to pass to _addActivity
-        uint256 len = _measures.length;
-        bytes32[] memory measureKeys = new bytes32[](len);
-
-        // register measures
-        for (uint256 i = 0; i < len; i++) {
-            // register the measure
-            bytes32 measureKey = _addMeasure(_measures[i]);
-            // add its key to the array to be passed to _addActivity
-            measureKeys[i] = measureKey;
-        }
-
-        // register activity
-        _addActivity(_activity, measureKeys, _ranges, _oracle);
+            _addActivities(_activityList, _oracleAddress);
     }
-
-    // fallback function (if exists)
-    // TODO
 
     // view functions
-
-    function getActivityName(bytes32 _activityKey) public view returns (string memory) {
-        return allowedActivities[_activityKey].name;
-    }
-
-    function getActivityMeasures(bytes32 _activityKey) public view returns (string[] memory measureNames) {
-        bytes32[] memory measures = allowedActivities[_activityKey].measures;
-        uint256 len = measures.length;
-        measureNames = new string[](len);
-        for (uint256 i = 0; i < len; i++) {
-            measureNames[i] = getMeasureName(measures[i]);
-        }
-
-        return measureNames;
-    }
-
-    function getMeasureName(bytes32 _measureKey) public view returns (string memory) {
-        return allowedMeasures[_measureKey].name;
+    /// @notice Get name string of activity based on key
+    /// @param _activityKey Keccak256 hashed, encoded name of activity
+    /// @dev Lookup in mapping and get name field
+    function getActivityName(bytes32 _activityKey) public view returns (string memory activityName) {
+        return activities[_activityKey].name;
     }
 
     // other public functions
-    function depositAndCommit(
-        bytes32 _activity,
-        uint256 _measureIndex,
-        uint256 _goal,
-        uint256 _startTime,
-        uint256 _stake,
-        uint256 _depositAmount
-    ) public returns (bool) {
-        require(deposit(_depositAmount), "SPC::depositAndCommit - deposit failed");
-
+    /// @notice Deposit amount of <token> into contract
+    /// @param amount Size of deposit
+    /// @dev Transfer amount to <token> contract, update balance, emit event
+    function deposit(uint256 amount) public returns (bool success) {
+        console.log("Received call for depositing amount %s from sender %s", amount, msg.sender);
         require(
-            makeCommitment(_activity, _measureIndex, _goal, _startTime, _stake),
-            "SPC::depositAndCommit - commitment failed"
+            token.transferFrom(msg.sender, address(this), amount), 
+            "SPC::deposit - token transfer failed"
         );
 
-        return true;
-    }
-
-    function deposit(uint256 amount) public returns (bool) {
-        console.log("Received call for depositing amount %s from sender %s", amount, msg.sender);
-        // make deposit
-        require(token.transferFrom(msg.sender, address(this), amount), "SPC::deposit - token transfer failed");
-
-        // update committer's balance
         _changeCommitterBalance(amount, true);
 
         emit Deposit(msg.sender, amount);
@@ -2028,68 +2822,20 @@ contract SinglePlayerCommit is Ownable {
         return true;
     }
 
-    function makeCommitment(
-        bytes32 _activity,
-        uint256 _measureIndex, // index of the Activity.measures array
-        uint256 _goal,
-        uint256 _startTime,
-        uint256 _stake
-    ) public returns (bool) {
-        console.log("makeCommitment called by %s", msg.sender);
-
-        require(!commitments[msg.sender].exists, "SPC::makeCommitment - msg.sender already has a commitment");
-        require(allowedActivities[_activity].allowed, "SPC::makeCommitment - activity doesn't exist or isn't allowed");
-        require(allowedActivities[_activity].measures.length >= _measureIndex+1, "SPC::makeCommitment - measure index out of bounds");
-
-        bytes32 measure = allowedActivities[_activity].measures[_measureIndex];
-
-        require(allowedMeasures[measure].allowed, "SPC::makeCommitment - measure doesn't exist or isn't allowed");
-        require(_startTime > block.timestamp, "SPC::makeCommitment - commitment cannot start in the past");
-
-        uint256[2] storage range = allowedActivities[_activity].ranges[_measureIndex];
-        require(_goal >= range[0], "SPC::makeCommitment - goal is too low");
-        require(_goal <= range[1], "SPC::makeCommitment - goal is too high");
-
-        require(balances[msg.sender] >= _stake, "SPC::makeCommitment - insufficient token balance");
-
-        uint256 endTime = _startTime.add(7 days);
-
-        // create commitment...
-        Commitment memory commitment = Commitment({
-            committer: msg.sender,
-            activity: _activity,
-            measure: measure,
-            goalValue: _goal,
-            start: _startTime,
-            end: endTime,
-            stake: _stake,
-            exists: true,
-            reportedValue: 0,
-            met: false
-        });
-
-        // ...and add it to storage
-        commitments[msg.sender] = commitment;
-        // committers.push(msg.sender);
-
-        emit NewCommitment(
-            msg.sender,
-            allowedActivities[_activity].name,
-            allowedMeasures[measure].name,
-            _startTime,
-            endTime,
-            _stake
-        );
-
-        return true;
-    }
-
-    function withdraw(uint256 amount) public returns (bool) {
+    /// @notice Public function to withdraw unstaked balance of user
+    /// @param amount Amount of <token> to withdraw
+    /// @dev Check balances and active stake, withdraw from balances, emit event
+    function withdraw(uint256 amount) public returns (bool success) {
         console.log("Received call for withdrawing amount %s from sender %s", amount, msg.sender);
-        uint256 available = balances[msg.sender].sub(commitments[msg.sender].stake);
-        require(amount >= available, "SPC::withdraw - not enough balance available");
+        uint256 available = committerBalances[msg.sender];
+        Commitment storage commitment = commitments[msg.sender];
 
-        // remove from committer's balance
+        if(commitment.exists == true){
+            available = available.sub(commitment.stake);
+        }
+
+        require(amount >= available, "SPC::withdraw - not enough (unstaked) balance available");
+
         _changeCommitterBalance(amount, false);
 
         require(token.transfer(msg.sender, amount), "SPC::withdraw - token transfer failed");
@@ -2099,112 +2845,374 @@ contract SinglePlayerCommit is Ownable {
         return true;
     }
 
-    // TODO
-    function report() public returns (bool) {
-        // get activity data from oracle
-        // record activity data in commitments
+    /// @notice Create commitment, store on-chain and emit event
+    /// @param _activityKey Keccak256 hashed, encoded name of activity
+    /// @param _goalValue Distance of activity as goal
+    /// @param _startTime Starttime of commitment, also used for endTime
+    /// @param _stake Amount of <token> to stake againt achieving goal
+    /// @param _userId ???
+    /// @dev Check parameters, create commitment, store on-chain and emit event
+    function makeCommitment(
+        bytes32 _activityKey,
+        uint256 _goalValue,
+        uint256 _startTime,
+        uint256 _stake,
+        string memory _userId
+    ) 
+        public 
+        returns (bool success) 
+    {
+        console.log("makeCommitment called by %s", msg.sender);
+
+        require(!commitments[msg.sender].exists, "SPC::makeCommitment - msg.sender already has a commitment");
+        require(activities[_activityKey].allowed, "SPC::makeCommitment - activity doesn't exist or isn't allowed");
+        require(_startTime > block.timestamp, "SPC::makeCommitment - commitment cannot start in the past");
+        require(_goalValue > 1, "SPC::makeCommitment - goal is too low");
+        require(committerBalances[msg.sender] >= _stake, "SPC::makeCommitment - insufficient token balance");
+
+        uint256 endTime = _startTime.add(7 days);
+
+        Commitment memory commitment = Commitment({
+            committer: msg.sender,
+            activityKey: _activityKey,
+            goalValue: _goalValue,
+            startTime: _startTime,
+            endTime: endTime,
+            stake: _stake,
+            reportedValue: 0,
+            lastActivityUpdate: 0,
+            met: false,
+            userId: _userId,
+            exists: true
+        });
+
+        commitments[msg.sender] = commitment;
+
+        emit NewCommitment(
+            msg.sender, 
+            activities[_activityKey].name, 
+            _goalValue, 
+            _startTime, 
+            endTime, 
+            _stake);
+
         return true;
     }
 
-    function processCommitment(address committer) public {
-        console.log("Processing commitment");
-        Commitment memory commitment = commitments[committer];
+    /// @notice Wrapper function to deposit <token> and create commitment in one call
+    /// @param _activityKey Keccak256 hashed, encoded name of activity
+    /// @param _goalValue Distance of activity as goal
+    /// @param _startTime Starttime of commitment, also used for endTime
+    /// @param _stake Amount of <token> to stake againt achieving goale
+    /// @param _depositAmount Size of deposit
+    /// @param _userId ???
+    /// @dev Call deposit and makeCommitment method
+    function depositAndCommit(
+        bytes32 _activityKey,
+        uint256 _goalValue,
+        uint256 _startTime,
+        uint256 _stake,
+        uint256 _depositAmount,
+        string memory _userId
+    ) 
+        public 
+        returns (bool success) 
+    {
+        require(deposit(_depositAmount), "SPC::depositAndCommit - deposit failed");
+        require(makeCommitment(
+                    _activityKey, 
+                    _goalValue, 
+                    _startTime, 
+                    _stake, 
+                    _userId
+                ), "SPC::depositAndCommit - commitment creation failed");
 
-        // check if commitment has ended
-        require(commitment.end < block.timestamp, "SPC::processCommitment - commitment is still active");
-
-        bool met = commitment.met;
-        uint256 stake = commitment.stake;
-
-        // "delete" the expired commitment
-        commitments[committer].exists = false;
-        // remove the committer from the list of committers
-        // committers[committer] = committers[committers.length.sub(1)];
-        // committers.pop();
-
-        uint256 penalty;
-
-        if (met) {
-            penalty = 0;
-        } else {
-            penalty = stake;
-            // remove from committer's balance
-            _changeCommitterBalance(penalty, false);
-        }
-
-        emit CommitmentEnded(committer, met, penalty);
+        return true;
     }
 
-    // function processCommitments() public returns (bool) {
-    //     for (uint256 i = 0; i < committers.length; i.add(1)) {
-    //         processCommitment(committers[i]);
-    //     }
+    //TODO DRY in procesCommitment methods
+    /// @notice Enables processing of open commitments after endDate that have not been processed by creator
+    /// @param committer address of the creator of the committer to process
+    /// @dev Process commitment by lookup based on address, checking metrics, state and updating balances
+    function processCommitment(address committer) public {
+        console.log("Processing commitment");
+        require(commitments[committer].exists, "SPC::processCommitment - commitment does not exist");
+        Commitment storage commitment = commitments[committer];
 
-    //     return true;
-    // }
+        require(commitment.endTime < block.timestamp, "SPC::processCommitment - commitment is still active");
+        require(commitment.endTime < commitment.lastActivityUpdate, "SPC::processCommitment - update activity");
 
+        commitment.met = commitment.reportedValue > commitment.goalValue;
+
+        if (!commitment.met) {
+            _slashFunds(commitment.stake, committer);
+        } 
+        
+        commitment.exists = false;
+        emit CommitmentEnded(committer, commitment.met, commitment.stake);
+    }
+
+    /// @notice Enables control of processing own commitment. For instance when completed.
+    /// @dev Process commitment by lookup msg.sender, checking metrics, state and updating balances
+    function processCommitmentUser() public {
+        console.log("Processing commitment");
+        require(commitments[msg.sender].exists, "SPC::processCommitmentUser - commitment does not exist");
+        Commitment storage commitment = commitments[msg.sender];
+
+        commitment.met = commitment.reportedValue > commitment.goalValue;
+
+        if (!commitment.met) {
+            _slashFunds(commitment.stake, msg.sender);
+        } 
+        
+        commitment.exists = false;
+        emit CommitmentEnded(msg.sender, commitment.met, commitment.stake);
+    }
+
+    //TODO state change after transfer is not recommended
+    /// @notice Contract owner can withdraw funds not owned by committers. E.g. slashed from failed commitments
+    /// @param amount Amount of <token> to withdraw
+    /// @dev Check amount against slashedBalance, transfer amount and update slashedBalance
     function ownerWithdraw(uint256 amount) public onlyOwner returns (bool) {
-        uint256 available = token.balanceOf(address(this)).sub(committerBalance);
+        console.log("Received call for owner withdrawal for amount %s", amount);
 
-        require(amount <= available, "SPC::ownerWithdraw - not enough available balance");
-
+        require(amount <= slashedBalance, "SPC::ownerWithdraw - not enough available balance");
         require(token.transfer(msg.sender, amount), "SPC::ownerWithdraw - token transfer failed");
+        slashedBalance -= amount;
 
+        return true;
+    }
+
+    /// @notice Internal function to update balance of caller and total balance
+    /// @param amount Amount of <token> to deposit/withdraw
+    /// @param add Boolean toggle to deposit or withdraw
+    /// @dev Based on add param add or substract amount from msg.sender balance and total committerBalance
+    function _changeCommitterBalance(uint256 amount, bool add) internal returns (bool success) {
+        if (add) {
+            committerBalances[msg.sender] = committerBalances[msg.sender].add(amount);
+            totalCommitterBalance = totalCommitterBalance.add(amount);
+        } else {
+            committerBalances[msg.sender] = committerBalances[msg.sender].sub(amount);
+            totalCommitterBalance = totalCommitterBalance.sub(amount);
+        }
+
+        return true;
+    }
+
+    /// @notice Internal function to slash funds from user
+    /// @param amount Amount of <token> to slash
+    /// @param committer Address of committer
+    /// @dev Substract amount from committer balance and add to slashedBalance
+    function _slashFunds(uint256 amount, address committer) internal returns (bool success) {
+        require(committerBalances[committer] >= amount, "SPC::_slashFunds - funds not available");
+        _changeCommitterBalance(amount, false);
+        slashedBalance += amount;
         return true;
     }
 
     // internal functions
+    /// @notice Adds list of activities with oracle (i.e. datasource) to contract
+    /// @param _activityList String list of activities reported by oracle
+    /// @param oracleAddress Address of oracle for activity data
+    /// @dev Basically just loops over _addActivity for list
+    function _addActivities(string[] memory _activityList, address oracleAddress) internal {
+        require(_activityList.length > 0, "SPC::_addActivities - list appears to be empty");
 
-    function _addMeasure(string memory _name) internal returns (bytes32 measureKey) {
-        Measure memory measure = Measure({ name: _name, allowed: true });
-
-        measureKey = keccak256(abi.encode(_name));
-        allowedMeasures[measureKey] = measure;
-        measureList.push(measureKey);
-
-        return measureKey;
-    }
-
-    function _addActivity(
-        string memory _name,
-        bytes32[] memory _measures,
-        uint256[2][] memory _ranges,
-        address _oracle
-    ) internal returns (bytes32 activityKey) {
-        uint256 measuresLength = _measures.length;
-        require(measuresLength == _ranges.length, "SPC::_addActivity - measures and ranges must have same length");
-
-        Activity memory activity;
-
-        activity.name = _name;
-        activity.oracle = _oracle;
-        activity.measures = _measures;
-        activity.ranges = _ranges;
-        activity.allowed = true;
-
-        activityKey = keccak256(abi.encode(_name));
-        allowedActivities[activityKey] = activity;
-        activityList.push(activityKey);
-
-        return activityKey;
-    }
-
-    function _changeCommitterBalance(uint256 amount, bool add) internal returns (bool) {
-        if (add) {
-            // increase committer's token balance
-            balances[msg.sender] = balances[msg.sender].add(amount);
-            // add to total committer balance sum
-            committerBalance = committerBalance.add(amount);
-        } else {
-            // decrease committer's token balance
-            balances[msg.sender] = balances[msg.sender].sub(amount);
-            // decrease total committer balance sum
-            committerBalance = committerBalance.sub(amount);
+        for (uint256 i = 0; i < _activityList.length; i++) {
+            _addActivity(_activityList[i], oracleAddress);
         }
 
+        console.log("All provided activities added");
+    }
+
+    /// @notice Add activity to contract's activityList
+    /// @param _activityName String name of activity
+    /// @param _oracleAddress Contract address of oracle
+    /// @dev Create key from name, create activity, push to activityList, return key
+    function _addActivity(string memory _activityName, address _oracleAddress) 
+        internal 
+        returns (bytes32 activityKey) 
+    {
+        bytes memory activityNameBytes = bytes(_activityName);
+        require(activityNameBytes.length > 0, "SPC::_addActivity - _activityName empty");
+
+        bytes32 _activityKey = keccak256(abi.encode(_activityName));
+
+        Activity memory activity = Activity({
+            name: _activityName,
+            oracle: _oracleAddress,
+            allowed: true,
+            exists: true
+        });
+
+        console.log(
+            "Registered activity %s",
+            _activityName
+        );
+
+        activities[_activityKey] = activity;
+        activityKeyList.push(_activityKey); 
+        emit ActivityUpdated(
+            activity.name, 
+            _activityKey, 
+            activity.oracle, 
+            activity.allowed, 
+            activity.exists);
+        return _activityKey;
+    }
+
+    /// @notice Function to update oracle address of existing activity
+    /// @param _activityKey Keccak256 hashed, encoded name of activity
+    /// @param _oracleAddress Address of oracle for activity data    
+    /// @dev Check activity exists, update state, emit event
+    function updateActivityOracle(bytes32 _activityKey, address _oracleAddress) 
+        public
+        onlyOwner 
+        returns (bool success)
+    {
+        require(activities[_activityKey].exists, "SPC::_updateActivityOracle - activity does not exist");
+        Activity storage activity = activities[_activityKey];
+        activity.oracle = _oracleAddress;
+        emit ActivityUpdated(
+                activity.name, 
+                _activityKey, 
+                activity.oracle, 
+                activity.allowed, 
+                activity.exists
+            );
         return true;
     }
+
+    /// @notice Function to update availability of activity of existing activity
+    /// @param _activityKey Keccak256 hashed, encoded name of activity
+    /// @param _allowed Toggle for allowing new commitments with activity    
+    /// @dev Check activity exists, update state, emit event
+    function updateActivityAllowed(bytes32 _activityKey, bool _allowed) 
+        public
+        onlyOwner 
+        returns (bool success)
+    {
+        require(activities[_activityKey].exists, "SPC::_updateActivityOracle - activity does not exist");
+        Activity storage activity = activities[_activityKey];
+        activity.allowed = _allowed;
+        emit ActivityUpdated(
+                activity.name, 
+                _activityKey, 
+                activity.oracle, 
+                activity.allowed, 
+                activity.exists
+            );
+        return true;
+    }
+
+    /// @notice Function to 'delete' an existing activity. One way function, cannot be reversed.
+    /// @param _activityKey Keccak256 hashed, encoded name of activity
+    /// @dev Check activity exists, update state, emit event
+    function disableActivity(bytes32 _activityKey) 
+        public
+        onlyOwner 
+        returns (bool success)
+    {
+        require(activities[_activityKey].exists, "SPC::_updateActivityOracle - activity does not exist");
+        Activity storage activity = activities[_activityKey];
+        activity.exists = false;
+        emit ActivityUpdated(
+                activity.name, 
+                _activityKey, 
+                activity.oracle, 
+                activity.allowed, 
+                activity.exists
+            );
+        return true;
+    }
+
+    //Chainlink functions
+    /// @notice Call ChainLink node to report distance measured based on Strava data
+    /// @param _committer Address of creator of commitment
+    /// @param _oracle ChainLink oracle address
+    /// @param _jobId ???
+    /// @dev Async function sending request to ChainLink node
+    function requestActivityDistance(address _committer, address _oracle, string memory _jobId)
+        public
+    {
+        Commitment memory commitment = commitments[_committer];
+        Chainlink.Request memory req = buildChainlinkRequest(
+                                            stringToBytes32(_jobId), 
+                                            address(this), 
+                                            this.fulfillActivityDistance.selector
+                                        );
+        req.add("type", activities[commitment.activityKey].name);
+        req.add("startTime", uint2str(commitment.startTime));
+        req.add("endTime", uint2str(commitment.endTime));
+        req.add("userId", commitment.userId);
+
+        bytes32 requestId = sendChainlinkRequestTo(_oracle, req, ORACLE_PAYMENT);
+        jobAddresses[requestId] = _committer;
+    }
+
+    /// @notice Register distance reported by ChainLink node
+    /// @param _requestId ID or request triggering the method call
+    /// @param _distance Distance to register
+    /// @dev Follow-up function to requestActivityDistance
+    function fulfillActivityDistance(bytes32 _requestId, uint256 _distance)
+        public
+        recordChainlinkFulfillment(_requestId)
+    {
+        emit RequestActivityDistanceFulfilled(_requestId, _distance);
+        address userAddress = jobAddresses[_requestId];
+        commitments[userAddress].reportedValue = _distance;
+        commitments[userAddress].lastActivityUpdate = block.timestamp;
+    }
+
+    /// @notice Get address for ChainLink token contract
+    /// @dev ChainLink contract method
+    function getChainlinkToken() public view returns (address) {
+        return chainlinkTokenAddress();
+    }
+
+    /// @notice Withdraw ChainLink token from contract to contract owner
+    function withdrawLink() public onlyOwner {
+        LinkTokenInterface link = LinkTokenInterface(chainlinkTokenAddress());
+        require(link.transfer(msg.sender, link.balanceOf(address(this))), "Unable to transfer");
+    }
+
+    function cancelRequest(
+        bytes32 _requestId,
+        uint256 _payment,
+        bytes4 _callbackFunctionId,
+        uint256 _expiration
+    )
+        public
+        onlyOwner
+    {
+        cancelChainlinkRequest(_requestId, _payment, _callbackFunctionId, _expiration);
+    }
+
+    function stringToBytes32(string memory source) private pure returns (bytes32 result) {
+        bytes memory tempEmptyStringTest = bytes(source);
+        if (tempEmptyStringTest.length == 0) {
+        return 0x0;
+        }
+
+        assembly { // solhint-disable-line no-inline-assembly
+        result := mload(add(source, 32))
+        }
+    }
+    
+    function uint2str(uint i) internal pure returns (string memory str){
+        if (i == 0) return "0";
+        uint j = i;
+        uint length;
+        while (j != 0){
+            length++;
+            j /= 10;
+        }
+        bytes memory bstr = new bytes(length);
+        uint k = length - 1;
+        while (i != 0){
+            bstr[k--] = byte(uint8(48 + i % 10)); 
+            i /= 10;
+        }
+        return string(bstr);
+    }
 }
-
-
-

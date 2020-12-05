@@ -148,7 +148,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
             available = available.sub(commitment.stake);
         }
 
-        require(amount >= available, "SPC::withdraw - not enough (unstaked) balance available");
+        require(amount <= available, "SPC::withdraw - not enough (unstaked) balance available");
 
         _changeCommitterBalance(amount, false);
 
@@ -250,12 +250,13 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     /// @dev Process commitment by lookup based on address, checking metrics, state and updating balances
     function processCommitment(address committer) public {
         console.log("Processing commitment");
+        require(commitments[committer].exists, "SPC::processCommitment - commitment does not exist");
         Commitment storage commitment = commitments[committer];
 
         require(commitment.endTime < block.timestamp, "SPC::processCommitment - commitment is still active");
         require(commitment.endTime < commitment.lastActivityUpdate, "SPC::processCommitment - update activity");
 
-        commitment.met = commitment.reportedValue > commitment.goalValue;
+        commitment.met = commitment.reportedValue >= commitment.goalValue;
 
         if (!commitment.met) {
             _slashFunds(commitment.stake, committer);
@@ -269,6 +270,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     /// @dev Process commitment by lookup msg.sender, checking metrics, state and updating balances
     function processCommitmentUser() public {
         console.log("Processing commitment");
+        require(commitments[msg.sender].exists, "SPC::processCommitmentUser - commitment does not exist");
         Commitment storage commitment = commitments[msg.sender];
 
         commitment.met = commitment.reportedValue > commitment.goalValue;
@@ -289,8 +291,9 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         console.log("Received call for owner withdrawal for amount %s", amount);
 
         require(amount <= slashedBalance, "SPC::ownerWithdraw - not enough available balance");
+        slashedBalance = slashedBalance.sub(amount);
+
         require(token.transfer(msg.sender, amount), "SPC::ownerWithdraw - token transfer failed");
-        slashedBalance -= amount;
 
         return true;
     }
@@ -318,7 +321,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     function _slashFunds(uint256 amount, address committer) internal returns (bool success) {
         require(committerBalances[committer] >= amount, "SPC::_slashFunds - funds not available");
         _changeCommitterBalance(amount, false);
-        slashedBalance += amount;
+        slashedBalance = slashedBalance.add(amount);
         return true;
     }
 
@@ -337,10 +340,10 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         console.log("All provided activities added");
     }
 
-    /// @notice Add activity to contract's activityList
+    /// @notice Add activity to contract's activityKeyList
     /// @param _activityName String name of activity
     /// @param _oracleAddress Contract address of oracle
-    /// @dev Create key from name, create activity, push to activityList, return key
+    /// @dev Create key from name, create activity, push to activityKeyList, return key
     function _addActivity(string memory _activityName, address _oracleAddress) 
         internal 
         returns (bytes32 activityKey) 

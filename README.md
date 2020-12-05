@@ -27,6 +27,25 @@ Ganache
 2. Start Ganache on port 8545
 3. In second terminal```npx buidler run --network localhost scripts/deploy.ts  ```
 
+#### Deploying to Matic
+1. ```npm install truffle -g```
+2. ```npm install truffle-flattener -g```
+
+Mumbai Testnet configured in ```./truffle-config.js```
+
+Test deployment using Truffle against a runnning Ganache instance: ```truffle migrate```
+Deploy to Mumbai testnet: ```truffle migrate --network matic```
+
+Verify deployment using contract address at the [Matic Explorer](https://explorer-mumbai.maticvigil.com/)
+
+*Verifying & publishing the contract code*
+In the [Matic Explorer](https://explorer-mumbai.maticvigil.com/) find your contract based on the address reported by Truffle.
+Go to the tab ```Code```
+
+Quite note on setting up Matic:
+* Configure Matic network in [MetaMask](https://docs.matic.network/docs/develop/metamask/config-matic/)
+* Request funds at [faucet](https://faucet.matic.network/)
+* Use this wallet's seed phrase in the .env file to pay the deployment
 
 #### Interacting with the contract
 After deploying to a local node
@@ -37,7 +56,7 @@ After deploying to a local node
 Example for interacting:
 ```await commitPool.withdraw(1000)```
 ## Features
-
+[Technical documentation](https://ipfs.io/ipfs/QmdJsGYi822G1azEMtGL39LRwXZtJRC58KT393TGPixP6z)
 #### Creation of Commitment
 
 A commitment consists of an ```activity```, a ```goalValue``` for given activity, a ```startTime```, and ```stake```. We will automagically set the ```endTime``` 7 days after the startdate.
