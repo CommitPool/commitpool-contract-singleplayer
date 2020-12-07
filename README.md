@@ -1,6 +1,5 @@
 ##  CommitPool Single Player Smart Contract repository
 
-
 [CommitPool](http://commitpool.com/) helps people meet their personal goals by holding themselves accountable. CommitPool users stake money to credibly commit to meeting their goals, and lose their stake when they don’t.
 
 Our MVP focuses on a single goal type for individuals, hence the Single Player mode.
@@ -21,11 +20,17 @@ Buidler
 2. ```npx buidler node```
 3. In second terminal```npx buidler run --network localhost scripts/deploy.ts  ```
 
-Ganache
+Buidler & Ganache
 
 1. Use node 12 (using nvm is recommended)
 2. Start Ganache on port 8545
 3. In second terminal```npx buidler run --network localhost scripts/deploy.ts  ```
+
+Truffle
+
+1. Use node 12 (using nvm is recommended)
+2. Start Ganache on port 8545
+3. In terminal```truffle migrate```
 
 #### Deploying to Matic
 1. ```npm install truffle -g```
@@ -35,7 +40,7 @@ Mumbai Testnet configured in ```./truffle-config.js```
 Test deployment using Truffle against a runnning Ganache instance: ```truffle migrate```
 Deploy to Mumbai testnet: ```truffle migrate --network matic```
 
-Verify deployment using contract address at the [Matic Explorer](https://explorer-mumbai.maticvigil.com/)
+Verify contract address at the [Matic Explorer](https://explorer-mumbai.maticvigil.com/)
 
 *Verifying & publishing the contract code*
 
@@ -49,7 +54,13 @@ Quite note on setting up Matic:
 * Request funds at [faucet](https://faucet.matic.network/)
 * Use this wallet's seed phrase in the .env file to pay the deployment
 
-#### Interacting with the contract
+Interaction with the contract on Matic via Truffle:
+1. ```truffle console --network matic```
+2. ```compile```
+3. ```var singlePlayerCommit = await SinglePlayerCommit.at('<ADDRESS FROM DEPLOYMENT>')```
+4. To test: ```await contractTest.activityKeyList(0)```
+
+#### Interacting with the contract using Buidler
 After deploying to a local node
 1. ```npx buidler console --network localhost     ```
 2. ```const CommitPool = await ethers.getContractFactory("SinglePlayerCommit")```

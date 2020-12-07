@@ -255,7 +255,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         require(commitment.endTime < block.timestamp, "SPC::processCommitment - commitment is still active");
         require(commitment.endTime < commitment.lastActivityUpdate, "SPC::processCommitment - update activity");
 
-        require(_commitmentSettlement(commitment), "SPC::processCommitmentUser - reconciliation failed");
+        require(_commitmentSettlement(commitment), "SPC::processCommitmentUser - settlement failed");
 
         emit CommitmentEnded(committer, commitment.met, commitment.stake);
     }
@@ -267,7 +267,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         require(commitments[msg.sender].exists, "SPC::processCommitmentUser - commitment does not exist");
         Commitment storage commitment = commitments[msg.sender];
 
-        require(_commitmentSettlement(commitment), "SPC::processCommitmentUser - reconciliation failed");
+        require(_commitmentSettlement(commitment), "SPC::processCommitmentUser - settlement failed");
         emit CommitmentEnded(msg.sender, commitment.met, commitment.stake);
     }
 
