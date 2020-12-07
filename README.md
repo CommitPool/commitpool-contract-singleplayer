@@ -29,7 +29,6 @@ Ganache
 
 #### Deploying to Matic
 1. ```npm install truffle -g```
-2. ```npm install truffle-flattener -g```
 
 Mumbai Testnet configured in ```./truffle-config.js```
 
@@ -39,8 +38,11 @@ Deploy to Mumbai testnet: ```truffle migrate --network matic```
 Verify deployment using contract address at the [Matic Explorer](https://explorer-mumbai.maticvigil.com/)
 
 *Verifying & publishing the contract code*
+
 In the [Matic Explorer](https://explorer-mumbai.maticvigil.com/) find your contract based on the address reported by Truffle.
 Go to the tab ```Code```
+
+Flattening contract: https://github.com/poanetwork/solidity-flattener and cleanup SPDX licenses and _Chainlink appended to classes like SafeMath, Buffer and ENSResolver
 
 Quite note on setting up Matic:
 * Configure Matic network in [MetaMask](https://docs.matic.network/docs/develop/metamask/config-matic/)

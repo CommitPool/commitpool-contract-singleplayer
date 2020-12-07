@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT */
-pragma solidity ^0.6.10;
+pragma solidity 0.6.10;
 pragma experimental ABIEncoderV2;
 
 import { console } from "@nomiclabs/buidler/console.sol";
@@ -129,7 +129,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
             "SPC::deposit - token transfer failed"
         );
 
-        _changeCommitterBalance(amount, true);
+        _changeCommitterBalance(msg.sender, amount, true);
 
         emit Deposit(msg.sender, amount);
 
@@ -150,7 +150,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
 
         require(amount <= available, "SPC::withdraw - not enough (unstaked) balance available");
 
-        _changeCommitterBalance(amount, false);
+        _changeCommitterBalance(msg.sender, amount, false);
 
         require(token.transfer(msg.sender, amount), "SPC::withdraw - token transfer failed");
 
@@ -244,7 +244,6 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         return true;
     }
 
-    //TODO DRY in procesCommitment methods
     /// @notice Enables processing of open commitments after endDate that have not been processed by creator
     /// @param committer address of the creator of the committer to process
     /// @dev Process commitment by lookup based on address, checking metrics, state and updating balances
@@ -256,13 +255,8 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         require(commitment.endTime < block.timestamp, "SPC::processCommitment - commitment is still active");
         require(commitment.endTime < commitment.lastActivityUpdate, "SPC::processCommitment - update activity");
 
-        commitment.met = commitment.reportedValue >= commitment.goalValue;
+        require(_commitmentSettlement(commitment), "SPC::processCommitmentUser - reconciliation failed");
 
-        if (!commitment.met) {
-            _slashFunds(commitment.stake, committer);
-        } 
-        
-        commitment.exists = false;
         emit CommitmentEnded(committer, commitment.met, commitment.stake);
     }
 
@@ -273,6 +267,13 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         require(commitments[msg.sender].exists, "SPC::processCommitmentUser - commitment does not exist");
         Commitment storage commitment = commitments[msg.sender];
 
+        require(_commitmentSettlement(commitment), "SPC::processCommitmentUser - reconciliation failed");
+        emit CommitmentEnded(msg.sender, commitment.met, commitment.stake);
+    }
+
+    /// @notice Internal function for evaluating commitment and slashing funds if needed
+    /// @dev Receive call with commitment object from storage
+    function _commitmentSettlement(Commitment storage commitment) internal returns (bool success) {
         commitment.met = commitment.reportedValue > commitment.goalValue;
 
         if (!commitment.met) {
@@ -280,10 +281,9 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         } 
         
         commitment.exists = false;
-        emit CommitmentEnded(msg.sender, commitment.met, commitment.stake);
+        return true;
     }
 
-    //TODO state change after transfer is not recommended
     /// @notice Contract owner can withdraw funds not owned by committers. E.g. slashed from failed commitments
     /// @param amount Amount of <token> to withdraw
     /// @dev Check amount against slashedBalance, transfer amount and update slashedBalance
@@ -302,12 +302,12 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     /// @param amount Amount of <token> to deposit/withdraw
     /// @param add Boolean toggle to deposit or withdraw
     /// @dev Based on add param add or substract amount from msg.sender balance and total committerBalance
-    function _changeCommitterBalance(uint256 amount, bool add) internal returns (bool success) {
+    function _changeCommitterBalance(address committer, uint256 amount, bool add) internal returns (bool success) {
         if (add) {
-            committerBalances[msg.sender] = committerBalances[msg.sender].add(amount);
+            committerBalances[committer] = committerBalances[committer].add(amount);
             totalCommitterBalance = totalCommitterBalance.add(amount);
         } else {
-            committerBalances[msg.sender] = committerBalances[msg.sender].sub(amount);
+            committerBalances[committer] = committerBalances[committer].sub(amount);
             totalCommitterBalance = totalCommitterBalance.sub(amount);
         }
 
@@ -320,7 +320,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     /// @dev Substract amount from committer balance and add to slashedBalance
     function _slashFunds(uint256 amount, address committer) internal returns (bool success) {
         require(committerBalances[committer] >= amount, "SPC::_slashFunds - funds not available");
-        _changeCommitterBalance(amount, false);
+        _changeCommitterBalance(committer, amount, false);
         slashedBalance = slashedBalance.add(amount);
         return true;
     }
