@@ -255,7 +255,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         require(commitment.endTime < block.timestamp, "SPC::processCommitment - commitment is still active");
         require(commitment.endTime < commitment.lastActivityUpdate, "SPC::processCommitment - update activity");
 
-        require(_commitmentSettlement(commitment), "SPC::processCommitmentUser - settlement failed");
+        require(_settleCommitment(commitment), "SPC::processCommitmentUser - settlement failed");
 
         emit CommitmentEnded(committer, commitment.met, commitment.stake);
     }
@@ -267,13 +267,13 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         require(commitments[msg.sender].exists, "SPC::processCommitmentUser - commitment does not exist");
         Commitment storage commitment = commitments[msg.sender];
 
-        require(_commitmentSettlement(commitment), "SPC::processCommitmentUser - settlement failed");
+        require(_settleCommitment(commitment), "SPC::processCommitmentUser - settlement failed");
         emit CommitmentEnded(msg.sender, commitment.met, commitment.stake);
     }
 
     /// @notice Internal function for evaluating commitment and slashing funds if needed
     /// @dev Receive call with commitment object from storage
-    function _commitmentSettlement(Commitment storage commitment) internal returns (bool success) {
+    function _settleCommitment(Commitment storage commitment) internal returns (bool success) {
         commitment.met = commitment.reportedValue > commitment.goalValue;
 
         if (!commitment.met) {
@@ -287,7 +287,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     /// @notice Contract owner can withdraw funds not owned by committers. E.g. slashed from failed commitments
     /// @param amount Amount of <token> to withdraw
     /// @dev Check amount against slashedBalance, transfer amount and update slashedBalance
-    function ownerWithdraw(uint256 amount) public onlyOwner returns (bool) {
+    function ownerWithdraw(uint256 amount) public onlyOwner returns (bool success) {
         console.log("Received call for owner withdrawal for amount %s", amount);
 
         require(amount <= slashedBalance, "SPC::ownerWithdraw - not enough available balance");
@@ -481,7 +481,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
 
     /// @notice Get address for ChainLink token contract
     /// @dev ChainLink contract method
-    function getChainlinkToken() public view returns (address) {
+    function getChainlinkToken() public view returns (address chainlinkTokenAddress) {
         return chainlinkTokenAddress();
     }
 

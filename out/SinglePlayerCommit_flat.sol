@@ -1,8 +1,7 @@
-/* SPDX-License-Identifier: MIT */
-pragma solidity 0.6.10;
-pragma experimental ABIEncoderV2;
+
 // File: https://github.com/smartcontractkit/chainlink/blob/master/evm-contracts/src/v0.6/vendor/SafeMathChainlink.sol
 
+pragma solidity ^0.6.0;
 
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
@@ -112,17 +111,23 @@ library SafeMathChainlink {
 
 // File: https://github.com/smartcontractkit/chainlink/blob/master/evm-contracts/src/v0.6/vendor/ENSResolver.sol
 
+pragma solidity ^0.6.0;
+
 abstract contract ENSResolver {
   function addr(bytes32 node) public view virtual returns (address);
 }
 
 // File: https://github.com/smartcontractkit/chainlink/blob/master/evm-contracts/src/v0.6/interfaces/PointerInterface.sol
 
+pragma solidity ^0.6.0;
+
 interface PointerInterface {
   function getAddress() external view returns (address);
 }
 
 // File: https://github.com/smartcontractkit/chainlink/blob/master/evm-contracts/src/v0.6/interfaces/ChainlinkRequestInterface.sol
+
+pragma solidity ^0.6.0;
 
 interface ChainlinkRequestInterface {
   function oracleRequest(
@@ -146,6 +151,8 @@ interface ChainlinkRequestInterface {
 
 // File: https://github.com/smartcontractkit/chainlink/blob/master/evm-contracts/src/v0.6/interfaces/LinkTokenInterface.sol
 
+pragma solidity ^0.6.0;
+
 interface LinkTokenInterface {
   function allowance(address owner, address spender) external view returns (uint256 remaining);
   function approve(address spender, uint256 value) external returns (bool success);
@@ -162,6 +169,8 @@ interface LinkTokenInterface {
 }
 
 // File: https://github.com/smartcontractkit/chainlink/blob/master/evm-contracts/src/v0.6/interfaces/ENSInterface.sol
+
+pragma solidity ^0.6.0;
 
 interface ENSInterface {
 
@@ -189,6 +198,8 @@ interface ENSInterface {
 }
 
 // File: https://github.com/smartcontractkit/chainlink/blob/master/evm-contracts/src/v0.6/vendor/BufferChainlink.sol
+
+pragma solidity ^0.6.0;
 
 /**
 * @dev A library for working with mutable byte buffers in Solidity.
@@ -492,6 +503,8 @@ library BufferChainlink {
 
 // File: https://github.com/smartcontractkit/chainlink/blob/master/evm-contracts/src/v0.6/vendor/CBORChainlink.sol
 
+pragma solidity ^0.6.0;
+
 
 library CBORChainlink {
   using BufferChainlink for BufferChainlink.buffer;
@@ -562,6 +575,10 @@ library CBORChainlink {
 }
 
 // File: https://github.com/smartcontractkit/chainlink/blob/master/evm-contracts/src/v0.6/Chainlink.sol
+
+pragma solidity ^0.6.0;
+
+
 
 /**
  * @title Library for common Chainlink functions
@@ -686,6 +703,15 @@ library Chainlink {
 }
 
 // File: https://github.com/smartcontractkit/chainlink/blob/master/evm-contracts/src/v0.6/ChainlinkClient.sol
+
+pragma solidity ^0.6.0;
+
+
+
+
+
+
+
 
 /**
  * @title The ChainlinkClient contract
@@ -866,7 +892,7 @@ contract ChainlinkClient {
     ens = ENSInterface(_ens);
     ensNode = _node;
     bytes32 linkSubnode = keccak256(abi.encodePacked(ensNode, ENS_TOKEN_SUBNAME));
-    ENSResolver resolver = ENSResolver(ens.resolver(linkSubnode));
+    ENSResolver_Chainlink resolver = ENSResolver_Chainlink(ens.resolver(linkSubnode));
     setChainlinkToken(resolver.addr(linkSubnode));
     updateChainlinkOracleWithENS();
   }
@@ -879,7 +905,7 @@ contract ChainlinkClient {
     internal
   {
     bytes32 oracleSubnode = keccak256(abi.encodePacked(ensNode, ENS_ORACLE_SUBNAME));
-    ENSResolver resolver = ENSResolver(ens.resolver(oracleSubnode));
+    ENSResolver_Chainlink resolver = ENSResolver_Chainlink(ens.resolver(oracleSubnode));
     setChainlinkOracle(resolver.addr(oracleSubnode));
   }
 
@@ -942,6 +968,10 @@ contract ChainlinkClient {
 }
 
 // File: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v3.1.0/contracts/token/ERC20/IERC20.sol
+
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.6.0;
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP.
@@ -1019,6 +1049,10 @@ interface IERC20 {
 
 // File: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v3.1.0/contracts/GSN/Context.sol
 
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.6.0;
+
 /*
  * @dev Provides information about the current execution context, including the
  * sender of the transaction and its data. While these are generally available
@@ -1041,6 +1075,10 @@ abstract contract Context {
 }
 
 // File: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v3.1.0/contracts/access/Ownable.sol
+
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.6.0;
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -1107,6 +1145,9 @@ contract Ownable is Context {
 }
 
 // File: https://github.com/nomiclabs/hardhat/blob/master/packages/hardhat-core/console.sol
+
+// SPDX-License-Identifier: MIT
+pragma solidity >= 0.4.22 <0.8.0;
 
 library console {
 	address constant CONSOLE_ADDRESS = address(0x000000000000000000636F6e736F6c652e6c6f67);
@@ -2643,6 +2684,17 @@ library console {
 }
 
 // File: browser/SinglePlayerCommit.sol
+
+/* SPDX-License-Identifier: MIT */
+pragma solidity 0.6.10;
+pragma experimental ABIEncoderV2;
+
+
+
+
+//https://github.com/smartcontractkit/chainlink/issues/3153#issuecomment-655241638
+
+
 /// @title CommitPool single-player mode contract
 /// @notice Enables staking and validating performance. No social/pool functionality.
 contract SinglePlayerCommit is ChainlinkClient, Ownable {
@@ -2888,7 +2940,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         require(commitment.endTime < block.timestamp, "SPC::processCommitment - commitment is still active");
         require(commitment.endTime < commitment.lastActivityUpdate, "SPC::processCommitment - update activity");
 
-        require(_commitmentSettlement(commitment), "SPC::processCommitmentUser - settlement failed");
+        require(_settleCommitment(commitment), "SPC::processCommitmentUser - settlement failed");
 
         emit CommitmentEnded(committer, commitment.met, commitment.stake);
     }
@@ -2900,13 +2952,13 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         require(commitments[msg.sender].exists, "SPC::processCommitmentUser - commitment does not exist");
         Commitment storage commitment = commitments[msg.sender];
 
-        require(_commitmentSettlement(commitment), "SPC::processCommitmentUser - settlement failed");
+        require(_settleCommitment(commitment), "SPC::processCommitmentUser - settlement failed");
         emit CommitmentEnded(msg.sender, commitment.met, commitment.stake);
     }
 
     /// @notice Internal function for evaluating commitment and slashing funds if needed
     /// @dev Receive call with commitment object from storage
-    function _commitmentSettlement(Commitment storage commitment) internal returns (bool success) {
+    function _settleCommitment(Commitment storage commitment) internal returns (bool success) {
         commitment.met = commitment.reportedValue > commitment.goalValue;
 
         if (!commitment.met) {
@@ -2920,7 +2972,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     /// @notice Contract owner can withdraw funds not owned by committers. E.g. slashed from failed commitments
     /// @param amount Amount of <token> to withdraw
     /// @dev Check amount against slashedBalance, transfer amount and update slashedBalance
-    function ownerWithdraw(uint256 amount) public onlyOwner returns (bool) {
+    function ownerWithdraw(uint256 amount) public onlyOwner returns (bool success) {
         console.log("Received call for owner withdrawal for amount %s", amount);
 
         require(amount <= slashedBalance, "SPC::ownerWithdraw - not enough available balance");
@@ -3114,7 +3166,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
 
     /// @notice Get address for ChainLink token contract
     /// @dev ChainLink contract method
-    function getChainlinkToken() public view returns (address) {
+    function getChainlinkToken() public view returns (address tokenAddress) {
         return chainlinkTokenAddress();
     }
 
