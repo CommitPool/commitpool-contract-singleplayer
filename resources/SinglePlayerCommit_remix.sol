@@ -2,18 +2,17 @@
 pragma solidity 0.6.10;
 pragma experimental ABIEncoderV2;
 
-import { console } from "@nomiclabs/buidler/console.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-// import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@chainlink/contracts/src/v0.6/ChainlinkClient.sol";
+import { console } from "https://github.com/nomiclabs/hardhat/blob/master/packages/hardhat-core/console.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v3.1.0/contracts/access/Ownable.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v3.1.0/contracts/token/ERC20/IERC20.sol";
+import "https://github.com/smartcontractkit/chainlink/blob/master/evm-contracts/src/v0.6/ChainlinkClient.sol";
 //https://github.com/smartcontractkit/chainlink/issues/3153#issuecomment-655241638
-import "@chainlink/contracts/src/v0.6/vendor/SafeMath.sol";
+import "https://github.com/smartcontractkit/chainlink/blob/master/evm-contracts/src/v0.6/vendor/SafeMathChainlink.sol";
 
 /// @title CommitPool single-player mode contract
 /// @notice Enables staking and validating performance. No social/pool functionality.
 contract SinglePlayerCommit is ChainlinkClient, Ownable {
-    using SafeMath for uint256;
+    using SafeMathChainlink for uint256;
 
     /******************
     GLOBAL CONSTANTS

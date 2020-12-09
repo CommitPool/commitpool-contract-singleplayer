@@ -33,23 +33,14 @@ Truffle
 3. In terminal```truffle migrate```
 
 #### Deploying to Matic
+Deployment to the Mumbai Testnet is configured in ```./truffle-config.js```
+
 1. ```npm install truffle -g```
+2. Deploy to Mumbai testnet: ```truffle migrate --network matic```
+3. Find your contract based on the address reported by Truffle in the [Matic Explorer](https://explorer-mumbai.maticvigil.com/).
 
-Mumbai Testnet configured in ```./truffle-config.js```
-
-Test deployment using Truffle against a runnning Ganache instance: ```truffle migrate```
-Deploy to Mumbai testnet: ```truffle migrate --network matic```
-
-Verify contract address at the [Matic Explorer](https://explorer-mumbai.maticvigil.com/)
-
-*Verifying & publishing the contract code*
-
-In the [Matic Explorer](https://explorer-mumbai.maticvigil.com/) find your contract based on the address reported by Truffle.
-Go to the tab ```Code```
-
-Flattening contract: https://github.com/poanetwork/solidity-flattener and cleanup SPDX licenses and _Chainlink appended to classes like SafeMath, Buffer and ENSResolver
-
-Quite note on setting up Matic:
+Quite note on deploying to Matic:
+* Test deployment using Truffle against a runnning Ganache instance: ```truffle migrate```
 * Configure Matic network in [MetaMask](https://docs.matic.network/docs/develop/metamask/config-matic/)
 * Request funds at [faucet](https://faucet.matic.network/)
 * Use this wallet's seed phrase in the .env file to pay the deployment
@@ -69,7 +60,7 @@ After deploying to a local node
 Example for interacting:
 ```await commitPool.withdraw(1000)```
 ## Features
-[Technical documentation](https://ipfs.io/ipfs/QmdJsGYi822G1azEMtGL39LRwXZtJRC58KT393TGPixP6z)
+[Technical documentation](https://ipfs.io/ipfs/https://ipfs.io/ipfs/QmVrBwsQ67RE9CVzyQRvDucK4LrjgB7tkAserztyBDNfJi)
 #### Creation of Commitment
 
 A commitment consists of an ```activity```, a ```goalValue``` for given activity, a ```startTime```, and ```stake```. We will automagically set the ```endTime``` 7 days after the startdate.
