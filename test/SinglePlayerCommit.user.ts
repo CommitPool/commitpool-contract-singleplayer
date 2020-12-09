@@ -23,10 +23,10 @@ export function userCanManageCommitments(): void {
     it("can deposit 100 DAI for staking", async function () {
       //User balance in wallet [ETH] and contract [DAI]
       const _userBalance: BigNumber = await user.getBalance();
-      const _userDaiBalanceInContract: BigNumber = await this.singlePlayerCommit.committerBalances(userAddress);
+      const _userDaiBalanceInContract: BigNumber = await contractWithUser.committerBalances(userAddress);
       
       //Committer balance on contract
-      const _committerBalance: BigNumber = await this.singlePlayerCommit.totalCommitterBalance();
+      const _committerBalance: BigNumber = await contractWithUser.totalCommitterBalance();
       expect(_userBalance).to.equal(utils.parseEther("10000.0"));
       expect(_userDaiBalanceInContract).to.equal(utils.parseEther("0.0"));
       expect(_committerBalance).to.equal(utils.parseEther("0.0"));
@@ -39,12 +39,12 @@ export function userCanManageCommitments(): void {
         .to.emit(contractWithUser, "Deposit")
         .withArgs(userAddress, _amountToDeposit);
       // expect("transferFrom").to.be.calledOnContract(this.token);
-      console.log("LALALALALALALAL") 
 
       //Validate balances
       const _updatedUserBalance: BigNumber = await user.getBalance();
-      const _updatedUserDaiBalanceInContract: BigNumber = await this.singlePlayerCommit.committerBalances(userAddress);
-      const _updatedCommitterBalance: BigNumber = await this.singlePlayerCommit.totalCommitterBalance();
+      const _updatedUserDaiBalanceInContract: BigNumber = await contractWithUser.committerBalances(userAddress);
+      console.log(_updatedUserDaiBalanceInContract.toString())
+      const _updatedCommitterBalance: BigNumber = await contractWithUser.totalCommitterBalance();
 
       expect(_updatedUserBalance.lt(_userBalance));
       expect(_updatedUserDaiBalanceInContract.eq(_amountToDeposit)).to.be.true;
@@ -54,10 +54,10 @@ export function userCanManageCommitments(): void {
     it("can withdraw 100 DAI from deposited funds", async function () {
       //User balance in wallet [ETH] and contract [DAI]
       const _userBalance: BigNumber = await user.getBalance();
-      const _userDaiBalanceInContract: BigNumber = await this.singlePlayerCommit.committerBalances(userAddress);
+      const _userDaiBalanceInContract: BigNumber = await contractWithUser.committerBalances(userAddress);
       
       //Committer balance on contract
-      const _committerBalance: BigNumber = await this.singlePlayerCommit.totalCommitterBalance();
+      const _committerBalance: BigNumber = await contractWithUser.totalCommitterBalance();
 
       expect(_userBalance.lt(utils.parseEther("10000.0"))).to.be.true;
       expect(_userDaiBalanceInContract).to.equal(utils.parseEther("100.0"));
@@ -68,14 +68,14 @@ export function userCanManageCommitments(): void {
 
       await this.token.mock.transfer.returns(true);
       await expect(contractWithUser.withdraw(_amountToWithdraw, _overrides))
-        .to.emit(this.singlePlayerCommit, "Withdrawal")
+        .to.emit(contractWithUser, "Withdrawal")
         .withArgs(await user.getAddress(), _amountToWithdraw);
       // expect("transfer").to.be.calledOnContract(this.token);
 
       //Validate
       const _updatedUserBalance: BigNumber = await user.getBalance();
-      const _updatedUserDaiBalanceInContract: BigNumber = await this.singlePlayerCommit.committerBalances(userAddress);
-      const _updatedCommitterBalance: BigNumber = await this.singlePlayerCommit.totalCommitterBalance();
+      const _updatedUserDaiBalanceInContract: BigNumber = await contractWithUser.committerBalances(userAddress);
+      const _updatedCommitterBalance: BigNumber = await contractWithUser.totalCommitterBalance();
 
       expect(_updatedUserBalance.lt(_userBalance)).to.be.true;
       expect(_updatedUserDaiBalanceInContract.isZero()).to.be.true;
@@ -84,7 +84,7 @@ export function userCanManageCommitments(): void {
 
     it("cannot make a commitment without deposited funds", async function () {
       //Transaction
-      const _activity: string = await this.singlePlayerCommit.activityKeyList(0);
+      const _activity: string = await contractWithUser.activityKeyList(0);
       const _goalValue: number = 50;
       const _startTime: number = Date.now();
       const _amountToStake: BigNumber = utils.parseEther("50.0");
@@ -100,12 +100,12 @@ export function userCanManageCommitments(): void {
 
       await this.token.mock.transferFrom.returns(true);
       await expect(contractWithUser.deposit(_amountToDeposit, _overrides))
-        .to.emit(this.singlePlayerCommit, "Deposit")
+        .to.emit(contractWithUser, "Deposit")
         .withArgs(await user.getAddress(), _amountToDeposit);
       // expect("transferFrom").to.be.calledOnContract(this.token);
 
       //Default parameters
-      let _activity: BytesLike = await this.singlePlayerCommit.activityKeyList(0);
+      let _activity: BytesLike = await contractWithUser.activityKeyList(0);
       let _goalValue: number = 50;
       let _startTime: number = Date.now().valueOf();
       const _amountToStake: BigNumber = utils.parseEther("50.0");
@@ -116,7 +116,7 @@ export function userCanManageCommitments(): void {
       await expect(
         contractWithUser.makeCommitment(_activity, _goalValue, _startTime, _amountToStake, userId, _overrides),
       ).to.be.revertedWith("SPC::makeCommitment - activity doesn't exist or isn't allowed");
-      _activity = await this.singlePlayerCommit.activityKeyList(0);
+      _activity = await contractWithUser.activityKeyList(0);
 
        //Goal
       _goalValue = 1;
@@ -140,7 +140,7 @@ export function userCanManageCommitments(): void {
 
       await this.token.mock.transfer.returns(true);
       await expect(contractWithUser.withdraw(_amountToWithdraw, _overrides))
-        .to.emit(this.singlePlayerCommit, "Withdrawal")
+        .to.emit(contractWithUser, "Withdrawal")
         .withArgs(await user.getAddress(), _amountToWithdraw);
       // expect("transfer").to.be.calledOnContract(this.token);
     });
@@ -148,24 +148,25 @@ export function userCanManageCommitments(): void {
     it("can deposit 100 DAI and make a commitment of biking 50 kms against 50 DAI stake", async function () {
       //User balance in wallet [ETH] and contract [DAI]
       const _userBalance: BigNumber = await user.getBalance();
-      expect(_userBalance.lt(utils.parseEther("10000000000000000.0"))).to.be.true;
-      const _userDaiBalanceInContract: BigNumber = await this.singlePlayerCommit.committerBalances(userAddress);
-      expect(_userDaiBalanceInContract).to.equal(utils.parseEther("0.0"));
+      const _userDaiBalanceInContract: BigNumber = await contractWithUser.committerBalances(userAddress);
 
       //Committer balance on contract
-      const _committerBalance: BigNumber = await this.singlePlayerCommit.totalCommitterBalance();
+      const _committerBalance: BigNumber = await contractWithUser.totalCommitterBalance();
+
+      expect(_userBalance.lt(utils.parseEther("10000000000000000.0"))).to.be.true;
+      expect(_userDaiBalanceInContract).to.equal(utils.parseEther("0.0"));
       expect(_committerBalance).to.equal(utils.parseEther("0.0"));
 
       // Deposit funds in contract
       const _amountToDeposit: BigNumber = utils.parseEther("100.0");
       await this.token.mock.transferFrom.returns(true);
       await expect(contractWithUser.deposit(_amountToDeposit, _overrides))
-        .to.emit(this.singlePlayerCommit, "Deposit")
+        .to.emit(contractWithUser, "Deposit")
         .withArgs(await user.getAddress(), _amountToDeposit);
       // expect("transferFrom").to.be.calledOnContract(this.token);
 
       //Transaction
-      const _activity: string = await this.singlePlayerCommit.activityKeyList(0);
+      const _activity: string = await contractWithUser.activityKeyList(0);
       const _goalValue: number = 50;
       const _startTime: number = Date.now();
       const _amountToStake: BigNumber = utils.parseEther("50.0");
@@ -173,14 +174,14 @@ export function userCanManageCommitments(): void {
       await this.token.mock.transfer.returns(true);
       await expect(
         contractWithUser.makeCommitment(_activity, _goalValue, _startTime, _amountToStake, userId, _overrides),
-      ).to.emit(this.singlePlayerCommit, "NewCommitment");
+      ).to.emit(contractWithUser, "NewCommitment");
 
       //Validate
-      const commitment = await this.singlePlayerCommit.commitments(userAddress);
-      const activityName = await this.singlePlayerCommit.getActivityName(commitment.activityKey);
+      const commitment = await contractWithUser.commitments(userAddress);
+      const activityName = await contractWithUser.getActivityName(commitment.activityKey);
       const _updatedUserBalance: BigNumber = await user.getBalance();
-      const _updatedUserDaiBalanceInContract: BigNumber = await this.singlePlayerCommit.committerBalances(userAddress);
-      const _updatedCommitterBalance: BigNumber = await this.singlePlayerCommit.totalCommitterBalance();
+      const _updatedUserDaiBalanceInContract: BigNumber = await contractWithUser.committerBalances(userAddress);
+      const _updatedCommitterBalance: BigNumber = await contractWithUser.totalCommitterBalance();
 
       expect(_updatedUserBalance.lt(_userBalance)).to.be.true;
       expect(_updatedUserDaiBalanceInContract).to.equal(utils.parseEther("100.0"));
@@ -198,11 +199,11 @@ export function userCanManageCommitments(): void {
     });
 
     it("not make more than one commitment", async function () {
-      const commitment = await this.singlePlayerCommit.commitments(userAddress);
+      const commitment = await contractWithUser.commitments(userAddress);
       expect(commitment.exists).to.be.true;
 
       //Transaction
-      const _activity: BytesLike = await this.singlePlayerCommit.activityKeyList(0);
+      const _activity: BytesLike = await contractWithUser.activityKeyList(0);
       const _goal: number = 50;
       const _startTime: number = Date.now();
       const _amountToStake: BigNumber = utils.parseEther("50.0");
@@ -214,21 +215,21 @@ export function userCanManageCommitments(): void {
     });
 
     it("slashes funds when resolving an unmet commitment", async function () {
-      const _userBalance: BigNumber = await this.singlePlayerCommit.committerBalances(userAddress);
-      const _slashedBalance: BigNumber = await this.singlePlayerCommit.slashedBalance();
-      let commitment = await this.singlePlayerCommit.commitments(userAddress);
+      const _userBalance: BigNumber = await contractWithUser.committerBalances(userAddress);
+      const _slashedBalance: BigNumber = await contractWithUser.slashedBalance();
+      let commitment = await contractWithUser.commitments(userAddress);
 
       expect(commitment.met).to.be.false;
       expect(commitment.exists).to.be.true;
 
       await expect(
         contractWithUser.processCommitmentUser(_overrides)).to.emit(
-          this.singlePlayerCommit, 
+          contractWithUser, 
           "CommitmentEnded");
 
-      commitment = await this.singlePlayerCommit.commitments(userAddress);
-      const _updatedUserBalance: BigNumber = await this.singlePlayerCommit.committerBalances(userAddress);
-      const _updatedSlashedBalance: BigNumber = await this.singlePlayerCommit.slashedBalance();
+      commitment = await contractWithUser.commitments(userAddress);
+      const _updatedUserBalance: BigNumber = await contractWithUser.committerBalances(userAddress);
+      const _updatedSlashedBalance: BigNumber = await contractWithUser.slashedBalance();
 
       expect(commitment.met).to.be.false;
       expect(commitment.exists).to.be.false;
@@ -238,17 +239,17 @@ export function userCanManageCommitments(): void {
 
     //TODO Configure start/endtime and resolve commitment
     it.skip(" can resolve a commitment after end date", async function () {
-      let commitment = await this.singlePlayerCommit.commitments(userAddress);
+      let commitment = await contractWithUser.commitments(userAddress);
 
       expect(commitment.met).to.be.false;
       expect(commitment.exists).to.be.true;
 
       await expect(contractWithUser.processCommitmentUser(_overrides)).to.emit(
-        this.singlePlayerCommit,
+        contractWithUser,
         "CommitmentEnded",
       );
 
-      commitment = await this.singlePlayerCommit.commitments(userAddress);
+      commitment = await contractWithUser.commitments(userAddress);
 
       expect(commitment.met).to.be.false;
       expect(commitment.exists).to.be.false;
@@ -259,15 +260,15 @@ export function userCanManageCommitments(): void {
       //User balance in wallet [ETH] and contract [DAI]
       const _userBalance: BigNumber = await user.getBalance();
       expect(_userBalance.lt(utils.parseEther("10000000000000000.0"))).to.be.true;
-      const _userDaiBalanceInContract: BigNumber = await this.singlePlayerCommit.committerBalances(userAddress);
+      const _userDaiBalanceInContract: BigNumber = await contractWithUser.committerBalances(userAddress);
       expect(_userDaiBalanceInContract).to.equal(utils.parseEther("100.0"));
 
       //Committer balance on contract
-      const _committerBalance: BigNumber = await this.singlePlayerCommit.totalCommitterBalance();
+      const _committerBalance: BigNumber = await contractWithUser.totalCommitterBalance();
       expect(_committerBalance).to.equal(utils.parseEther("100.0"));
 
       //Transaction
-      const _activity: BytesLike = await this.singlePlayerCommit.activityKeyList(0);
+      const _activity: BytesLike = await contractWithUser.activityKeyList(0);
       const _goalValue: number = 50;
       const _startTime: number = Date.now();
       const _amountToStake: BigNumber = utils.parseEther("50.0");
@@ -285,7 +286,7 @@ export function userCanManageCommitments(): void {
           userId,
           _overrides,
         ),
-      ).to.emit(this.singlePlayerCommit, "NewCommitment")
+      ).to.emit(contractWithUser, "NewCommitment")
       .withArgs(await user.getAddress(), _activity, _goalValue, _startTime, _expectedEndTime, _amountToStake);
 
       // expect("transferFrom").to.be.calledOnContract(this.token);
@@ -293,17 +294,17 @@ export function userCanManageCommitments(): void {
       // expect("makeCommitment").to.be.calledOnContract(this.singlePlayerCommit);
 
       //Validate
-      const commitment = await this.singlePlayerCommit.commitments(userAddress);
+      const commitment = await contractWithUser.commitments(userAddress);
       const _updatedUserBalance: BigNumber = await user.getBalance();
-      const _updatedUserDaiBalanceInContract: BigNumber = await this.singlePlayerCommit.committerBalances(userAddress);
-      const _updatedCommitterBalance: BigNumber = await this.singlePlayerCommit.committerBalance();
+      const _updatedUserDaiBalanceInContract: BigNumber = await contractWithUser.committerBalances(userAddress);
+      const _updatedCommitterBalance: BigNumber = await contractWithUser.committerBalance();
 
       expect(_updatedUserBalance.lt(_userBalance)).to.be.true;
       expect(_updatedUserDaiBalanceInContract).to.equal(utils.parseEther("100.0"));
       expect(_updatedCommitterBalance).to.equal(utils.parseEther("100.0"));
 
       expect(commitment.committer).to.be.properAddress;
-      expect(await this.singlePlayerCommit.getActivityName(commitment.activityKey)).to.equal("biking");
+      expect(await contractWithUser.getActivityName(commitment.activityKey)).to.equal("biking");
       expect(commitment.goalValue.toNumber()).to.equal(_goalValue);
       expect(commitment.stake).to.equal(_amountToStake);
       expect(commitment.startTime).to.equal(_startTime);

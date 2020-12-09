@@ -35,14 +35,13 @@ describe("SinglePlayerCommit", function () {
       const supportedActivities: string[] = ["biking", "running"];
 
       console.log("Deploying SinglePlayerCommit with %s", supportedActivities);
-      // const SinglePlayerCommit: ContractFactory = await ethers.getContractFactory("SinglePlayerCommit");
 
       this.singlePlayerCommit = (await deployContract(this.signers.admin, SinglePlayerCommitArtifact, [
         supportedActivities,
         this.oracle.address,
         this.token.address,
       ])) as SinglePlayerCommit;
-      // console.log("SinglePlayerCommit deployed to ", await this.singlePlayerCommit.address);
+      console.log("SinglePlayerCommit deployed to ", await this.singlePlayerCommit.address);
     });
 
     shouldDeployWithInitialParameters();

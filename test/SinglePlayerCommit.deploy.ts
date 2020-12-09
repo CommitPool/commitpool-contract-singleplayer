@@ -1,9 +1,10 @@
 import { expect } from "chai";
-import { ethers, waffle } from "hardhat";
+// import { ethers, waffle } from "hardhat";
 import { BigNumber, BytesLike, utils } from "ethers";
 
 export function shouldDeployWithInitialParameters(): void {
-  it("has the 'biking' and 'running' activity and it is allowed", async function () {
+  context("Deploy", function () {
+    it("has the 'biking' and 'running' activity and it is allowed", async function () {
     // this.contract = await this.singlePlayerCommit.connect(this.signers.admin);
 
     const _activityNames: string[] = ["biking", "running"];
@@ -65,4 +66,6 @@ export function shouldDeployWithInitialParameters(): void {
     expect(_tokenBalanceInContract.eq(utils.parseEther("0.0"))).to.be.true;
     expect(_slashedBalance.eq(utils.parseEther("0.0"))).to.be.true;
   });
+})
+
 }
