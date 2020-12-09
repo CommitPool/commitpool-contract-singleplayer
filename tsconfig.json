@@ -11,8 +11,7 @@
     "sourceMap": true,
     "strict": true,
     "target": "es5",
-    "types": ["node"]
-  },
+   },
   "exclude": ["node_modules"],
   "include": [
     "@types/**/*",
@@ -24,14 +23,15 @@
     "tasks/**/*",
     "test/**/*",
     "typechain/**/*",
+    "types/**/*",
     "truffle-config.js",
-    "buidler.config.ts"
+    "hardhat.config.ts"
   ],
   "files": [
-    "./buidler.config.ts",
-    "./node_modules/@nomiclabs/buidler-ethers/src/type-extensions.d.ts",
-    "./node_modules/@nomiclabs/buidler-waffle/src/type-extensions.d.ts",
-    "./node_modules/@nomiclabs/buidler-web3/src/type-extensions.d.ts",
-    "./node_modules/@nomiclabs/buidler-truffle5/src/type-extensions.d.ts"
+    "hardhat.config.ts",
+    "./node_modules/@nomiclabs/hardhat-ethers/src/type-extensions.d.ts",
+    "./node_modules/@nomiclabs/hardhat-waffle/src/type-extensions.d.ts",
+    "./node_modules/@nomiclabs/hardhat-web3/src/type-extensions.d.ts",
+    "./node_modules/@nomiclabs/hardhat-truffle5/src/type-extensions.d.ts"
   ]
 }

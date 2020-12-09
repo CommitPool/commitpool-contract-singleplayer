@@ -1,14 +1,12 @@
 import { expect } from "chai";
-import { ethers } from "@nomiclabs/buidler";
+import { ethers } from "hardhat";
 import { Signer, utils, BigNumber, BytesLike } from "ethers";
 import { SinglePlayerCommit } from "../typechain/SinglePlayerCommit";
-import { Address } from "cluster";
 
 export function ownerCanManageContract(): void {
   context("Owner", function () {
     let owner: Signer;
     let contractWithOwner: SinglePlayerCommit;
-    let contractAddress;
     let ownerAddress: string;
     const _overrides = {
       gasLimit: 1000000,
@@ -25,8 +23,8 @@ export function ownerCanManageContract(): void {
       //Start balances
       const _ownerBalance: BigNumber = await owner.getBalance();
       const _ownerDaiBalanceInContract: BigNumber = await this.singlePlayerCommit.committerBalances(ownerAddress);
-      const _slashedBalance: BigNumber = await this.singlePlayerCommit.slashedBalance.call();
-      const _committerBalance: BigNumber = await this.singlePlayerCommit.totalCommitterBalance.call();
+      const _slashedBalance: BigNumber = await this.singlePlayerCommit.slashedBalance();
+      const _committerBalance: BigNumber = await this.singlePlayerCommit.totalCommitterBalance();
 
       expect(_ownerBalance.lt(utils.parseEther("10000.0"))).to.be.true; //Lower than because of deployment
       expect(_ownerDaiBalanceInContract.eq(utils.parseEther("0.0"))).to.be.true;
@@ -57,8 +55,8 @@ export function ownerCanManageContract(): void {
       let _updatedOwnerDaiBalanceInContract: BigNumber = await this.singlePlayerCommit.committerBalances(
         ownerAddress,
       );
-      let _updatedCommitterBalance: BigNumber = await this.singlePlayerCommit.totalCommitterBalance.call();
-      let _updatedSlashedBalance = await this.singlePlayerCommit.slashedBalance.call();
+      let _updatedCommitterBalance: BigNumber = await this.singlePlayerCommit.totalCommitterBalance();
+      let _updatedSlashedBalance = await this.singlePlayerCommit.slashedBalance();
 
       expect(_updatedOwnerBalance.lt(_ownerBalance)).to.be.true;
       expect(_updatedOwnerDaiBalanceInContract.eq(_amountToDeposit)).to.be.true;
@@ -72,7 +70,7 @@ export function ownerCanManageContract(): void {
         "CommitmentEnded",
       );
 
-      _updatedSlashedBalance = await this.singlePlayerCommit.slashedBalance.call();
+      _updatedSlashedBalance = await this.singlePlayerCommit.slashedBalance();
       expect(_updatedSlashedBalance.eq(_amountToStake)).to.be.true;
 
       //Transaction to withdraw slashed funds
@@ -84,8 +82,8 @@ export function ownerCanManageContract(): void {
       _updatedOwnerDaiBalanceInContract= await this.singlePlayerCommit.committerBalances(
         ownerAddress,
       ); 
-      _updatedCommitterBalance= await this.singlePlayerCommit.totalCommitterBalance.call();
-      _updatedSlashedBalance = await this.singlePlayerCommit.slashedBalance.call();
+      _updatedCommitterBalance= await this.singlePlayerCommit.totalCommitterBalance();
+      _updatedSlashedBalance = await this.singlePlayerCommit.slashedBalance();
 
       expect(_updatedOwnerBalance.lt(_ownerBalance)).to.be.true;
       expect(_updatedOwnerDaiBalanceInContract.eq(_amountToDeposit.sub(_amountToStake))).to.be.true;

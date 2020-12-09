@@ -1,8 +1,10 @@
 //Setup
-import { ethers } from "@nomiclabs/buidler";
-import { BigNumberish, Signer, ContractFactory} from "ethers";
+import { Signer } from "ethers";
+import { ethers, waffle } from "hardhat";
 
 //Artifacts
+import SinglePlayerCommitArtifact from "../artifacts/contracts/SinglePlayerCommit.sol/SinglePlayerCommit.json";
+import { Accounts, Signers } from "../types";
 import { SinglePlayerCommit } from "../typechain/SinglePlayerCommit";
 import daiArtifact from "./resources/DAI.json";
 import chainLinkArtifact from "./resources/ChainLink.json";
@@ -12,46 +14,39 @@ import { shouldDeployWithInitialParameters } from "./SinglePlayerCommit.deploy";
 import { userCanManageCommitments } from "./SinglePlayerCommit.user";
 import { ownerCanManageContract } from "./SinglePlayerCommit.owner";
 
-import bre from "@nomiclabs/buidler";
-const waffle = bre.waffle;
+const { deployContract } = waffle;
 
-setTimeout(async function () {
-  describe("SinglePlayerCommit contract", async function () {
-    let accounts: Signer[];
-    let owner: Signer;
+// setTimeout(async function () {
+describe("SinglePlayerCommit", function () {
+  before(async function () {
+    console.log("Setting up environment [provider, signers, mock contracts]");
+    this.accounts = {} as Accounts;
+    this.signers = {} as Signers;
 
-    const supportedActivities: string[] = ["biking", "running"];
+    const signers: Signer[] = await ethers.getSigners();
+    this.signers.admin = signers[0];
+    this.accounts.admin = await signers[0].getAddress();
+    this.oracle = await waffle.deployMockContract(this.signers.admin, chainLinkArtifact);
+    this.token = await waffle.deployMockContract(this.signers.admin, daiArtifact);
+  });
 
-    before(async function () {
-      console.log("Setting up environment [provider, signers, mock contracts]")
-      accounts = await ethers.getSigners();
-      owner = accounts[0];
-      this.oracle = await waffle.deployMockContract(owner, chainLinkArtifact);
-      this.token = await waffle.deployMockContract(owner, daiArtifact);
+  describe("Unittest", function () {
+    beforeEach(async function () {
+      const supportedActivities: string[] = ["biking", "running"];
 
       console.log("Deploying SinglePlayerCommit with %s", supportedActivities);
-      const SinglePlayerCommit: ContractFactory = await ethers.getContractFactory("SinglePlayerCommit");
+      // const SinglePlayerCommit: ContractFactory = await ethers.getContractFactory("SinglePlayerCommit");
 
-      this.singlePlayerCommit = (await SinglePlayerCommit.deploy(
+      this.singlePlayerCommit = (await deployContract(this.signers.admin, SinglePlayerCommitArtifact, [
         supportedActivities,
         this.oracle.address,
         this.token.address,
-      )) as SinglePlayerCommit;
-      await this.singlePlayerCommit.deployed();
-
-      console.log("SinglePlayerCommit deployed to ", this.singlePlayerCommit.address);
-
+      ])) as SinglePlayerCommit;
+      // console.log("SinglePlayerCommit deployed to ", await this.singlePlayerCommit.address);
     });
 
-    describe("Deployment was succesful if contract", function () {
-      shouldDeployWithInitialParameters();
-    });
-
-    describe("Contract interactions", function () {
-      ownerCanManageContract();
-      userCanManageCommitments();
-    });
+    shouldDeployWithInitialParameters();
+    ownerCanManageContract();
+    userCanManageCommitments();
   });
-
-  run();
-}, 1000);
+});
