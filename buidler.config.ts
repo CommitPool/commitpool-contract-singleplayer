@@ -60,6 +60,11 @@ const config: BuidlerConfig = {
       ...createHDAccountConfig("kovan"),
       chainId: 42,
     },
+    localhostGanache: {
+      ...createHDAccountConfig("ganache"),
+      url: "http://127.0.0.1:7545",
+      chainId: 5777,
+    },
     rinkeby: {
       ...createHDAccountConfig("rinkeby"),
       chainId: 4,

@@ -22,7 +22,6 @@ setTimeout(async function () {
 
     const supportedActivities: string[] = ["biking", "running"];
 
-
     before(async function () {
       console.log("Setting up environment [provider, signers, mock contracts]")
       accounts = await ethers.getSigners();

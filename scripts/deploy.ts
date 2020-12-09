@@ -12,20 +12,16 @@ async function main(): Promise<void> {
   // await run("compile");
 
   // We get the contract to deploy
-
-  // Contract SingleplayerCommit
-  // string memory _activity,
-  // string[] memory _measures,
-  // uint256[2][] memory _ranges,
-  // address _oracle,
-  // address _token
-  const activity: string = "biking";
-  const measures: string[] = ["km"];
-  const ranges: BigNumberish[][] = [[2, 1024]];
-  const oracle: string = "";
-  const token: string = "";
+  //TODO oracle and token to env.var
+  if (!process.env.ORACLE_ADDRESS || !process.env.TOKEN_ADDRESS) {
+    console.log("Please set your oracle and token address in a .env file");
+    process.exit(1);
+  }
+  const activities: string[] = ["biking", "cycling"];
+  const oracle: string = process.env.ORACLE_ADDRESS;
+  const token: string = process.env.TOKEN_ADDRESS;
   const SinglePlayerCommit: ContractFactory = await ethers.getContractFactory("SinglePlayerCommit");
-  const singlePlayerCommit: Contract = await SinglePlayerCommit.deploy(activity, measures, ranges, oracle, token);
+  const singlePlayerCommit: Contract = await SinglePlayerCommit.deploy(activities, oracle, token);
   await singlePlayerCommit.deployed();
 
   console.log("SinglePlayerCommit deployed to: ", singlePlayerCommit.address);
