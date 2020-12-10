@@ -2,8 +2,8 @@
 // but useful for running the script in a standalone fashion through `node <script>`.
 // When running the script with `buidler run <script>` you'll find the Buidler
 // Runtime Environment's members available in the global scope.
-import { ethers } from "@nomiclabs/buidler";
-import { BigNumberish, Contract, ContractFactory } from "ethers";
+import { ethers } from "hardhat";
+import { Contract, ContractFactory } from "ethers";
 
 async function main(): Promise<void> {
   // Buidler always runs the compile task when running scripts through it.
@@ -12,7 +12,6 @@ async function main(): Promise<void> {
   // await run("compile");
 
   // We get the contract to deploy
-  //TODO oracle and token to env.var
   if (!process.env.ORACLE_ADDRESS || !process.env.TOKEN_ADDRESS) {
     console.log("Please set your oracle and token address in a .env file");
     process.exit(1);

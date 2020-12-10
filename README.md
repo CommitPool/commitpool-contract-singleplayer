@@ -13,6 +13,8 @@ Currently Ganache and Node 14 are not playing well together. To get started:
 3. ```npm run-script build```
 4. ```npm test``` (to verify the build)
 
+Note: [Hardhat guide](https://hardhat.org/guides/vscode-tests.html) on running test in VSCode
+
 #### Deploying to local node
 Buidler
 

@@ -2,7 +2,7 @@
 pragma solidity 0.6.10;
 pragma experimental ABIEncoderV2;
 
-import { console } from "@nomiclabs/buidler/console.sol";
+import { console } from "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 // import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
