@@ -35,6 +35,7 @@ export function ownerCanManageContract(): void {
       const _activity: BytesLike = await contractWithOwner.activityKeyList(0);
       const _goalValue: number = 50;
       const _startTime: number = Date.now();
+      const _amountOfDays: number = 7;
       const _amountToStake: BigNumber = utils.parseEther("50.0");
       const _amountToDeposit: BigNumber = utils.parseEther("100.0");
 
@@ -43,7 +44,8 @@ export function ownerCanManageContract(): void {
         contractWithOwner.depositAndCommit(
           _activity,
           _goalValue,
-          _startTime,
+          _startTime, 
+          _amountOfDays,
           _amountToStake,
           _amountToDeposit,
           userId,

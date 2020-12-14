@@ -170,6 +170,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         bytes32 _activityKey,
         uint256 _goalValue,
         uint256 _startTime,
+        uint256 _amountOfDays,
         uint256 _stake,
         string memory _userId
     ) 
@@ -184,7 +185,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         require(_goalValue > 1, "SPC::makeCommitment - goal is too low");
         require(committerBalances[msg.sender] >= _stake, "SPC::makeCommitment - insufficient token balance");
 
-        uint256 endTime = addDays(_startTime, 7);
+        uint256 endTime = addDays(_startTime, _amountOfDays);
 
         Commitment memory commitment = Commitment({
             committer: msg.sender,
@@ -225,6 +226,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         bytes32 _activityKey,
         uint256 _goalValue,
         uint256 _startTime,
+        uint256 _amountOfDays,
         uint256 _stake,
         uint256 _depositAmount,
         string memory _userId
@@ -237,6 +239,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
                     _activityKey, 
                     _goalValue, 
                     _startTime, 
+                    _amountOfDays,
                     _stake, 
                     _userId
                 ), "SPC::depositAndCommit - commitment creation failed");

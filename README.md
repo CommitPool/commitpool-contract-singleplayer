@@ -34,6 +34,13 @@ Truffle
 2. Start Ganache on port 8545
 3. In terminal```truffle migrate```
 
+---------
+Deploy:
+```$ npx hardhat run --network ropsten scripts/deploy.ts```
+
+Verify:
+```$ npx hardhat verify --constructor-args resources/arguments.js [DEPLOYED ADDRESS```
+
 #### Deploying to Matic
 Deployment to the Mumbai Testnet is configured in ```./truffle-config.js```
 
