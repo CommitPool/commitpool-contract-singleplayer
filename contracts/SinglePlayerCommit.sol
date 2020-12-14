@@ -515,7 +515,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     }
 
     function addDays(uint256 date, uint256 daysAfter) public pure returns (uint256 updatedDate){
-        return date + daysAfter * 1 days;
+        return (date + daysAfter * 1 days);
     }
     
     function uint2str(uint i) internal pure returns (string memory str){
