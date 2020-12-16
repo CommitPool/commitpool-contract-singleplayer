@@ -25,6 +25,12 @@ module.exports = {
       port: 8545,
       network_id: "*", // Match any network id
     },
+    ropsten: {
+      provider: function() {
+        return new HDWalletProvider(process.env.MNEMONIC, "https://ropsten.infura.io/v3/bec77b2c1b174308bcaa3e622828448f")
+      },
+      network_id: 3
+    },
     matic: {
         provider: () => new HDWalletProvider(process.env.MNEMONIC, `https://rpc-mumbai.matic.today`),
         network_id: 80001,
