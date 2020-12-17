@@ -2,7 +2,7 @@
 pragma solidity 0.6.10;
 pragma experimental ABIEncoderV2;
 
-import { console } from "hardhat/console.sol";
+import { console } from "@nomiclabs/buidler/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 // import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -185,7 +185,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         require(_goalValue > 1, "SPC::makeCommitment - goal is too low");
         require(committerBalances[msg.sender] >= _stake, "SPC::makeCommitment - insufficient token balance");
 
-        uint256 endTime = addDays(_startTime, 7);
+        uint256 endTime = _startTime.add(7 days);
 
         Commitment memory commitment = Commitment({
             committer: msg.sender,
@@ -513,10 +513,6 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
         assembly { // solhint-disable-line no-inline-assembly
         result := mload(add(source, 32))
         }
-    }
-
-    function addDays(uint256 date, uint256 daysAfter) public pure returns (uint256 updatedDate){
-        return date + daysAfter * 1 days;
     }
     
     function uint2str(uint i) internal pure returns (string memory str){
