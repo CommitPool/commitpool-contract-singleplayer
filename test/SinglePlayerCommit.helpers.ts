@@ -12,7 +12,7 @@ export function hasHandyHelperFunctions(): void {
     console.log(_startDate);
     const _endDateTimeStamp: BigNumber = await this.singlePlayerCommit
       .addDays(_startDateTimestamp, 7);
-    const _endDate = new Date(_endDateTimeStamp);
+    const _endDate = new Date(_endDateTimeStamp.toString());
 
 
     //Validate
