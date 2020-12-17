@@ -11,6 +11,7 @@ import "@nomiclabs/hardhat-waffle";
 // import "@nomiclabs/hardhat-ethers";
 import "hardhat-typechain";
 import "solidity-coverage";
+import "@nomiclabs/hardhat-etherscan";
 
 const chainIds = {
   ganache: 1337,
@@ -53,6 +54,11 @@ function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig 
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
+  etherscan: {
+    // Your API key for Etherscan
+    // Obtain one at https://etherscan.io/
+    apiKey: process.env.ETHERSCAN_API_KEY
+  },
   networks: {
     hardhat: {
       chainId: chainIds.hardhat,
