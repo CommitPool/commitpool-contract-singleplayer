@@ -106,6 +106,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
             console.log("Constructor called for SinglePlayerCommit contract");
             require(_activityList.length >= 1, "SPC::constructor - activityList empty");
             token = IERC20(_token);
+            setChainlinkToken(_token);
 
             _addActivities(_activityList, _oracleAddress);
     }
