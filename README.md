@@ -71,7 +71,7 @@ After deploying to a local node
 Example for interacting:
 ```await commitPool.withdraw(1000)```
 ## Features
-[Technical documentation](https://ipfs.io/ipfs/https://ipfs.io/ipfs/QmVrBwsQ67RE9CVzyQRvDucK4LrjgB7tkAserztyBDNfJi)
+[Technical documentation](https://ipfs.io/ipfs/QmVrBwsQ67RE9CVzyQRvDucK4LrjgB7tkAserztyBDNfJi)
 #### Creation of Commitment
 
 A commitment consists of an ```activity```, a ```goalValue``` for given activity, a ```startTime```, and ```stake```. We will automagically set the ```endTime``` 7 days after the startdate.
