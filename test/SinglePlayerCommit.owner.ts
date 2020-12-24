@@ -130,14 +130,15 @@ export function ownerCanManageContract(): void {
       expect(activity.allowed).to.be.true;  
     })
 
-    //TODO test deletion. First implement fixture for easy state manipulation
-    it.skip("can disable activity", async function() {
+    it("can disable activity", async function() {
       const _activityKey: BytesLike = await contractWithOwner.activityKeyList(0);  
-      const activity = await contractWithOwner.activities(_activityKey);
+      let activity = await contractWithOwner.activities(_activityKey);
       expect(activity.allowed).to.be.true;
 
-      await expect(contractWithOwner.deleteActivity(_activityKey, false, _overrides)).to.emit(contractWithOwner, "ActivityUpdated"); 
-      await expect(contractWithOwner.activities(_activityKey, _overrides)).to.be.reverted;
+      await expect(contractWithOwner.disableActivity(_activityKey, _overrides)).to.emit(contractWithOwner, "ActivityUpdated"); 
+      
+      activity = await contractWithOwner.activities(_activityKey);
+      expect(activity.exists).to.be.false;
       
     })
   });
