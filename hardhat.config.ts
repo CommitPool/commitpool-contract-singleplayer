@@ -11,6 +11,7 @@ import "@nomiclabs/hardhat-waffle";
 import "hardhat-typechain";
 import "solidity-coverage";
 import "@nomiclabs/hardhat-etherscan";
+import { removeConsoleLog } from 'hardhat-preprocessor';
 
 const chainIds = {
   ganache: 1337,
@@ -72,6 +73,9 @@ const config: HardhatUserConfig = {
     cache: "./cache",
     sources: "./contracts",
     tests: "./test",
+  },
+  preprocess: {
+    eachLine: removeConsoleLog((hre) => hre.network.name !== 'hardhat' && hre.network.name !== 'localhost'),
   },
   solidity: {
     version: "0.6.10",

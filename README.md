@@ -41,7 +41,7 @@ Deploy on ropsten:
 Verify on ropsten:
 ```$ npx hardhat verify --network ropsten --constructor-args resources/arguments.js [DEPLOYED ADDRESS```
 
-npx hardhat verify --constructor-args resources/arguments.js 0x078c65Ff670580196C52BFa29892BaCab493a740
+npx hardhat verify --network ropsten --constructor-args resources/arguments.js 0xC6DBaDc1e1bB4Ec1E3792CDb2Aad09b9b2720e86
 
 #### Deploying to Matic
 Deployment to the Mumbai Testnet is configured in ```./truffle-config.js```
