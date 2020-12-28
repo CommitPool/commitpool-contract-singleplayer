@@ -91,12 +91,6 @@ export function ownerCanManageContract(): void {
       expect(_updatedOwnerDaiBalanceInContract.eq(_amountToDeposit.sub(_amountToStake))).to.be.true;
       expect(_updatedCommitterBalance.eq(_amountToDeposit.sub(_amountToStake))).to.be.true;
       expect(_updatedSlashedBalance.eq(utils.parseEther("0.0"))).to.be.true;
-
-      //Transaction to clean up balance
-      await this.token.mock.transfer.returns(true);
-      await expect(contractWithOwner.withdraw(_updatedOwnerDaiBalanceInContract, _overrides))
-        .to.emit(contractWithOwner, "Withdrawal")
-        .withArgs(await owner.getAddress(), _updatedOwnerDaiBalanceInContract);
     });
 
     it("can update activity oracle", async function() {

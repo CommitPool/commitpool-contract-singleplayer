@@ -149,14 +149,14 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     /// @notice Create commitment, store on-chain and emit event
     /// @param _activityKey Keccak256 hashed, encoded name of activity
     /// @param _goalValue Distance of activity as goal
-    /// @param _startTime Starttime of commitment, also used for endTime
+    /// @param _daysToStart Starttime of commitment, also used for endTime
     /// @param _stake Amount of <token> to stake againt achieving goal
     /// @param _userId ???
     /// @dev Check parameters, create commitment, store on-chain and emit event
     function makeCommitment(
         bytes32 _activityKey,
         uint256 _goalValue,
-        uint256 _startTime,
+        uint256 _daysToStart,
         uint256 _amountOfDays,
         uint256 _stake,
         string memory _userId
@@ -165,19 +165,18 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
 
         require(!commitments[msg.sender].exists, "SPC::makeCommitment - msg.sender already has a commitment");
         require(activities[_activityKey].allowed, "SPC::makeCommitment - activity doesn't exist or isn't allowed");
-        //TODO timestamp is not precise. Has a margen that the _startTime (usually Date.now()) is lower than block.timestamp
-        // require(_startTime > block.timestamp, "SPC::makeCommitment - commitment cannot start in the past");
         require(_goalValue > 1, "SPC::makeCommitment - goal is too low");
         require(committerBalances[msg.sender] >= _stake, "SPC::makeCommitment - insufficient token balance");
 
-        uint256 endTime = addDays(_amountOfDays, _startTime);
+        uint256 startTime = _daysToStart > 0 ? addDays(_daysToStart, block.timestamp): block.timestamp;
+        uint256 endTime = addDays(_amountOfDays, startTime);
 
         Commitment memory commitment =
             Commitment({
                 committer: msg.sender,
                 activityKey: _activityKey,
                 goalValue: _goalValue,
-                startTime: _startTime,
+                startTime: startTime,
                 endTime: endTime,
                 stake: _stake,
                 reportedValue: 0,
@@ -189,7 +188,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
 
         commitments[msg.sender] = commitment;
 
-        emit NewCommitment(msg.sender, activities[_activityKey].name, _goalValue, _startTime, endTime, _stake);
+        emit NewCommitment(msg.sender, activities[_activityKey].name, _goalValue, _daysToStart, endTime, _stake);
 
         return true;
     }
@@ -197,7 +196,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     /// @notice Wrapper function to deposit <token> and create commitment in one call
     /// @param _activityKey Keccak256 hashed, encoded name of activity
     /// @param _goalValue Distance of activity as goal
-    /// @param _startTime Starttime of commitment, also used for endTime
+    /// @param _daysToStart Starttime of commitment, also used for endTime
     /// @param _stake Amount of <token> to stake againt achieving goale
     /// @param _depositAmount Size of deposit
     /// @param _userId ???
@@ -205,7 +204,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     function depositAndCommit(
         bytes32 _activityKey,
         uint256 _goalValue,
-        uint256 _startTime,
+        uint256 _daysToStart,
         uint256 _amountOfDays,
         uint256 _stake,
         uint256 _depositAmount,
@@ -213,7 +212,7 @@ contract SinglePlayerCommit is ChainlinkClient, Ownable {
     ) public returns (bool success) {
         require(deposit(_depositAmount), "SPC::depositAndCommit - deposit failed");
         require(
-            makeCommitment(_activityKey, _goalValue, _startTime, _amountOfDays, _stake, _userId),
+            makeCommitment(_activityKey, _goalValue, _daysToStart, _amountOfDays, _stake, _userId),
             "SPC::depositAndCommit - commitment creation failed"
         );
 

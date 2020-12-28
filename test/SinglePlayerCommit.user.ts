@@ -20,7 +20,7 @@ export function userCanManageCommitments(): void {
       userAddress = await user.getAddress();
     });
 
-    it("can deposit and withdraw 100 DAI for staking", async function () {
+    it("can deposit and withdraw 100 DAI", async function () {
       //User balance in wallet [ETH] and contract [DAI]
       const _userBalance: BigNumber = await user.getBalance();
       const _userDaiBalanceInContract: BigNumber = await contractWithUser.committerBalances(userAddress);
@@ -39,18 +39,17 @@ export function userCanManageCommitments(): void {
         .to.emit(contractWithUser, "Deposit")
         .withArgs(userAddress, _amountToTransfer);
       // expect("transferFrom").to.be.calledOnContract(this.token);
-
+      
       //Transaction to withdraw
 
       await this.token.mock.transfer.returns(true);
       await expect(contractWithUser.withdraw(_amountToTransfer, _overrides))
         .to.emit(contractWithUser, "Withdrawal")
-        .withArgs(await user.getAddress(), _amountToTransfer);
+        .withArgs(userAddress, _amountToTransfer);
 
       //Validate balances
       const _updatedUserBalance: BigNumber = await user.getBalance();
       const _updatedUserDaiBalanceInContract: BigNumber = await contractWithUser.committerBalances(userAddress);
-      console.log(_updatedUserDaiBalanceInContract.toString())
       const _updatedCommitterBalance: BigNumber = await contractWithUser.totalCommitterBalance();
 
       expect(_updatedUserBalance.lt(_userBalance));
@@ -69,19 +68,19 @@ export function userCanManageCommitments(): void {
       //Transaction
       const _activity: BytesLike = await contractWithUser.activityKeyList(0);
       const _goal: number = 50;
-      const _startTime: number = Date.now();
+      const _daysToStart: number = 0;
       const _amountOfDays: number = 7;
       const _amountToStake: BigNumber = utils.parseEther("50.0");
 
       await expect(
-        contractWithUser.makeCommitment(_activity, _goal, _startTime, _amountOfDays, _amountToStake, userId, _overrides),
+        contractWithUser.makeCommitment(_activity, _goal, _daysToStart, _amountOfDays, _amountToStake, userId, _overrides)
       ).to.emit(contractWithUser, "NewCommitment")
 
       const commitment = await contractWithUser.commitments(userAddress);
       expect(commitment.exists).to.be.true;
 
       await expect(
-        contractWithUser.makeCommitment(_activity, _goal, _startTime, _amountOfDays, _amountToStake, userId, _overrides),
+        contractWithUser.makeCommitment(_activity, _goal, _daysToStart, _amountOfDays, _amountToStake, userId, _overrides),
       ).to.be.revertedWith("SPC::makeCommitment - msg.sender already has a commitment");
     });
 
@@ -89,12 +88,12 @@ export function userCanManageCommitments(): void {
       //Transaction
       const _activity: string = await contractWithUser.activityKeyList(0);
       const _goalValue: number = 50;
-      const _startTime: number = Date.now();
-      const _amountOfDays: number = Date.now();
+      const _daysToStart: number = 0;
+      const _amountOfDays: number = 7;
       const _amountToStake: BigNumber = utils.parseEther("50.0");
 
       await expect(
-        contractWithUser.makeCommitment(_activity, _goalValue, _startTime, _amountOfDays, _amountToStake, userId, _overrides),
+        contractWithUser.makeCommitment(_activity, _goalValue, _daysToStart, _amountOfDays, _amountToStake, userId, _overrides),
       ).to.be.revertedWith("SPC::makeCommitment - insufficient token balance");
     });
 
@@ -111,7 +110,7 @@ export function userCanManageCommitments(): void {
       //Default parameters
       let _activity: BytesLike = await contractWithUser.activityKeyList(0);
       let _goalValue: number = 50;
-      const _startTime = Date.now().valueOf();
+      const _daysToStart: number = 0;
       const _amountOfDays: number = 7;
       const _amountToStake: BigNumber = utils.parseEther("50.0");
 
@@ -119,7 +118,7 @@ export function userCanManageCommitments(): void {
       _activity = '0xb16dfc4a050ca7e77c1c5f443dc473a2f03ac722e25f721ab6333875f44984f2';
 
       await expect(
-        contractWithUser.makeCommitment(_activity, _goalValue, _startTime, _amountOfDays, _amountToStake, userId, _overrides),
+        contractWithUser.makeCommitment(_activity, _goalValue, _daysToStart, _amountOfDays, _amountToStake, userId, _overrides),
       ).to.be.revertedWith("SPC::makeCommitment - activity doesn't exist or isn't allowed");
       _activity = await contractWithUser.activityKeyList(0);
 
@@ -127,7 +126,7 @@ export function userCanManageCommitments(): void {
       _goalValue = 1;
 
       await expect(
-        contractWithUser.makeCommitment(_activity, _goalValue, _startTime, _amountOfDays, _amountToStake, userId, _overrides),
+        contractWithUser.makeCommitment(_activity, _goalValue, _daysToStart, _amountOfDays, _amountToStake, userId, _overrides),
       ).to.be.revertedWith("SPC::makeCommitment - goal is too low");
 
       _goalValue = 50;
@@ -155,13 +154,13 @@ export function userCanManageCommitments(): void {
       //Transaction
       const _activity: string = await contractWithUser.activityKeyList(0);
       const _goalValue: number = 50;
-      const _startTime: number = Date.now();
+      const _daysToStart: number = 0;
       const _amountOfDays: number = 7;
       const _amountToStake: BigNumber = utils.parseEther("50.0");
 
       await this.token.mock.transfer.returns(true);
       await expect(
-        contractWithUser.makeCommitment(_activity, _goalValue, _startTime, _amountOfDays, _amountToStake, userId, _overrides),
+        contractWithUser.makeCommitment(_activity, _goalValue, _daysToStart, _amountOfDays, _amountToStake, userId, _overrides),
       ).to.emit(contractWithUser, "NewCommitment");
 
       //Validate
@@ -179,8 +178,9 @@ export function userCanManageCommitments(): void {
       expect(activityName).to.equal("biking");
       expect(commitment.goalValue.toNumber()).to.equal(_goalValue);
       expect(commitment.stake).to.equal(_amountToStake);
-      expect(commitment.startTime).to.equal(_startTime);
-      expect(commitment.endTime.lt(_startTime));
+        //TODO check startime against block.timestamp and same for endTime
+      // expect(commitment.startTime).to.equal(_daysToStart);
+      // expect(commitment.endTime.lt(_daysToStart));
       expect(commitment.met).to.be.false; 
       expect(commitment.exists).to.be.true;
       expect(commitment.userId).to.not.be.undefined; //TODO can be more specific?
@@ -198,12 +198,12 @@ export function userCanManageCommitments(): void {
       //Transaction
       const _activity: BytesLike = await contractWithUser.activityKeyList(0);
       const _goal: number = 50;
-      const _startTime: number = Date.now();
+      const _daysToStart: number = 0;
       const _amountOfDays: number = 7;
       const _amountToStake: BigNumber = utils.parseEther("50.0");
 
       await expect(
-        contractWithUser.makeCommitment(_activity, _goal, _startTime, _amountOfDays, _amountToStake, userId, _overrides),
+        contractWithUser.makeCommitment(_activity, _goal, _daysToStart, _amountOfDays, _amountToStake, userId, _overrides),
       ).to.emit(contractWithUser, "NewCommitment")
 
       let commitment = await contractWithUser.commitments(userAddress);
@@ -255,18 +255,18 @@ export function userCanManageCommitments(): void {
       //Transaction
       const _activity: string = await contractWithUser.activityKeyList(0);
       const _goalValue: number = 50;
-      const _startTime: number = Date.now();
+      const _daysToStart: number = 0;
       const _amountOfDays: number = 7;
       const _amountToStake: BigNumber = utils.parseEther("50.0");
       const _amountToDeposit: BigNumber = utils.parseEther("100.0");
-      const _expectedEndTime = addDays(_startTime, 7);
+      const _expectedEndTime = addDays(_daysToStart, 7);
 
       await this.token.mock.transfer.returns(true);
       await expect(
         contractWithUser.depositAndCommit(
           _activity,
           _goalValue,
-          _startTime,
+          _daysToStart,
           _amountOfDays,
           _amountToStake,
           _amountToDeposit,
@@ -274,7 +274,6 @@ export function userCanManageCommitments(): void {
           _overrides,
         ),
       ).to.emit(contractWithUser, "NewCommitment");
-
 
       // expect("transferFrom").to.be.calledOnContract(this.token);
       // expect("deposit").to.be.calledOnContract(this.singlePlayerCommit);
@@ -295,8 +294,9 @@ export function userCanManageCommitments(): void {
       expect(activityName).to.equal("biking");
       expect(commitment.goalValue.toNumber()).to.equal(_goalValue);
       expect(commitment.stake).to.equal(_amountToStake);
-      expect(commitment.startTime).to.equal(_startTime);
-      expect(commitment.endTime.gt(commitment.startTime));
+      //TODO check startTime against block.timestamp
+      // expect(commitment.startTime).to.equal(_daysToStart);
+      // expect(commitment.endTime.gt(commitment.startTime));
       expect(commitment.met).to.be.false; 
       expect(commitment.exists).to.be.true;
       expect(commitment.userId).to.not.be.undefined; //TODO can be more specific?

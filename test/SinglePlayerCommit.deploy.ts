@@ -4,7 +4,6 @@ import { BigNumber, BytesLike, utils } from "ethers";
 export function shouldDeployWithInitialParameters(): void {
   context("Deploy", function () {
     it("has the 'biking' and 'running' activity and it is allowed", async function () {
-    // this.contract = await this.singlePlayerCommit.connect(this.signers.admin);
 
     const _activityNames: string[] = ["biking", "running"];
     const _activityKeys: BytesLike[] = [];
