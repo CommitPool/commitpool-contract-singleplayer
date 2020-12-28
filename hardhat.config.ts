@@ -11,6 +11,7 @@ import "@nomiclabs/hardhat-waffle";
 import "hardhat-typechain";
 import "solidity-coverage";
 import "@nomiclabs/hardhat-etherscan";
+import "hardhat-abi-exporter";
 import { removeConsoleLog } from 'hardhat-preprocessor';
 
 const chainIds = {
@@ -53,6 +54,13 @@ function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig 
 }
 
 const config: HardhatUserConfig = {
+  // https://hardhat.org/plugins/hardhat-abi-exporter.html
+  abiExporter: {
+    path: './out/abi',
+    clear: true,
+    flat: false,
+    only: [],
+  },
   defaultNetwork: "hardhat",
   etherscan: {
     // Your API key for Etherscan

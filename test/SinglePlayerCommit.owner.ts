@@ -8,15 +8,34 @@ export function ownerCanManageContract(): void {
     let owner: Signer;
     let contractWithOwner: SinglePlayerCommit;
     let ownerAddress: string;
+    const currentDate = new Date()
+    const startDate = Math.floor(currentDate.valueOf() / 1000);
+    const endDate = Math.floor(addDays(currentDate, 7).valueOf() / 1000);
+    const defaultParams = {
+      activityKey: "",
+      goal: 0,
+      startTime: startDate,
+      endTime: endDate,
+      amountToDeposit: utils.parseEther("100.0"),
+      amountToStake: utils.parseEther("50.0"),
+      userId: "testUser"
+    }
     const _overrides = {
       gasLimit: 1000000,
     };
-    const userId = "testUser";
 
-    before(async function () {
+    beforeEach(async function () {
       [owner] = await ethers.getSigners();
       contractWithOwner = this.singlePlayerCommit.connect(owner);
       ownerAddress = await owner.getAddress();
+
+      //Default commitment parameters
+      defaultParams.activityKey = await contractWithOwner.activityKeyList(0);
+      defaultParams.goal = 50;
+      defaultParams.startTime  = startDate;
+      defaultParams.endTime = endDate;
+      defaultParams.amountToDeposit = utils.parseEther("100.0")
+      defaultParams.amountToStake = utils.parseEther("50.0")
     });
 
     it("can withdraw slashed balance", async function () {
@@ -32,22 +51,17 @@ export function ownerCanManageContract(): void {
       expect(_slashedBalance.eq(utils.parseEther("0.0"))).to.be.true;
 
       //Transaction to deposit and commit
-      const _activity: BytesLike = await contractWithOwner.activityKeyList(0);
-      const _goalValue: number = 50;
-      const _startTime: number = Date.now();
-      const _amountOfDays: number = 7;
-      const _amountToStake: BigNumber = utils.parseEther("50.0");
-      const _amountToDeposit: BigNumber = utils.parseEther("100.0");
+      const { activityKey, goal, startTime, endTime, amountToDeposit, amountToStake, userId } = defaultParams;
 
       await this.token.mock.transferFrom.returns(true);
       await expect(
         contractWithOwner.depositAndCommit(
-          _activity,
-          _goalValue,
-          _startTime, 
-          _amountOfDays,
-          _amountToStake,
-          _amountToDeposit,
+          activityKey,
+          goal,
+          startTime, 
+          endTime,
+          amountToStake,
+          amountToDeposit,
           userId,
           _overrides,
         ),
@@ -61,8 +75,8 @@ export function ownerCanManageContract(): void {
       let _updatedSlashedBalance = await contractWithOwner.slashedBalance();
 
       expect(_updatedOwnerBalance.lt(_ownerBalance)).to.be.true;
-      expect(_updatedOwnerDaiBalanceInContract.eq(_amountToDeposit)).to.be.true;
-      expect(_updatedCommitterBalance.eq(_amountToDeposit)).to.be.true;
+      expect(_updatedOwnerDaiBalanceInContract.eq(amountToDeposit)).to.be.true;
+      expect(_updatedCommitterBalance.eq(amountToDeposit)).to.be.true;
       expect(_updatedSlashedBalance.eq(utils.parseEther("0.0"))).to.be.true;
 
       //Process commitment (not met => slashing)
@@ -73,7 +87,7 @@ export function ownerCanManageContract(): void {
       );
 
       _updatedSlashedBalance = await contractWithOwner.slashedBalance();
-      expect(_updatedSlashedBalance.eq(_amountToStake)).to.be.true;
+      expect(_updatedSlashedBalance.eq(amountToStake)).to.be.true;
 
       //Transaction to withdraw slashed funds
       await this.token.mock.transfer.returns(true);
@@ -88,52 +102,57 @@ export function ownerCanManageContract(): void {
       _updatedSlashedBalance = await contractWithOwner.slashedBalance();
 
       expect(_updatedOwnerBalance.lt(_ownerBalance)).to.be.true;
-      expect(_updatedOwnerDaiBalanceInContract.eq(_amountToDeposit.sub(_amountToStake))).to.be.true;
-      expect(_updatedCommitterBalance.eq(_amountToDeposit.sub(_amountToStake))).to.be.true;
+      expect(_updatedOwnerDaiBalanceInContract.eq(amountToDeposit.sub(amountToStake))).to.be.true;
+      expect(_updatedCommitterBalance.eq(amountToDeposit.sub(amountToStake))).to.be.true;
       expect(_updatedSlashedBalance.eq(utils.parseEther("0.0"))).to.be.true;
     });
 
     it("can update activity oracle", async function() {
-      const _activityKey: BytesLike = await contractWithOwner.activityKeyList(0);  
+      const { activityKey } = defaultParams;  
       const randomAddress = "0xd115bffabbdd893a6f7cea402e7338643ced44a6";    
-      let activity = await contractWithOwner.activities(_activityKey);
+      let activity = await contractWithOwner.activities(activityKey);
 
-      await expect(contractWithOwner.updateActivityOracle(_activityKey, utils.getAddress(randomAddress), _overrides)).to.emit(contractWithOwner, "ActivityUpdated");
+      await expect(contractWithOwner.updateActivityOracle(activityKey, utils.getAddress(randomAddress), _overrides)).to.emit(contractWithOwner, "ActivityUpdated");
       
-      activity = await contractWithOwner.activities(_activityKey);
+      activity = await contractWithOwner.activities(activityKey);
       expect(activity.name).to.equal('biking');
       expect(utils.getAddress(activity.oracle)).to.equal(utils.getAddress(randomAddress));
       expect(activity.allowed).to.be.true;
       expect(activity.exists).to.be.true;    
     })
 
-
     it("can update activity allowed", async function() {
-      const _activityKey: BytesLike = await contractWithOwner.activityKeyList(0);  
-      let activity = await contractWithOwner.activities(_activityKey);
+      const { activityKey } = defaultParams;  
+      let activity = await contractWithOwner.activities(activityKey);
       expect(activity.allowed).to.be.true;
 
-      await expect(contractWithOwner.updateActivityAllowed(_activityKey, false, _overrides)).to.emit(contractWithOwner, "ActivityUpdated");
+      await expect(contractWithOwner.updateActivityAllowed(activityKey, false, _overrides)).to.emit(contractWithOwner, "ActivityUpdated");
       
-      activity = await contractWithOwner.activities(_activityKey);
+      activity = await contractWithOwner.activities(activityKey);
       expect(activity.allowed).to.be.false;    
 
-      await expect(contractWithOwner.updateActivityAllowed(_activityKey, true, _overrides)).to.emit(contractWithOwner, "ActivityUpdated");
+      await expect(contractWithOwner.updateActivityAllowed(activityKey, true, _overrides)).to.emit(contractWithOwner, "ActivityUpdated");
       
-      activity = await contractWithOwner.activities(_activityKey);
+      activity = await contractWithOwner.activities(activityKey);
       expect(activity.allowed).to.be.true;  
     })
 
     it("can disable activity", async function() {
-      const _activityKey: BytesLike = await contractWithOwner.activityKeyList(0);  
-      let activity = await contractWithOwner.activities(_activityKey);
+      const { activityKey } = defaultParams;  
+      let activity = await contractWithOwner.activities(activityKey);
       expect(activity.allowed).to.be.true;
 
-      await expect(contractWithOwner.disableActivity(_activityKey, _overrides)).to.emit(contractWithOwner, "ActivityUpdated"); 
+      await expect(contractWithOwner.disableActivity(activityKey, _overrides)).to.emit(contractWithOwner, "ActivityUpdated"); 
       
-      activity = await contractWithOwner.activities(_activityKey);
+      activity = await contractWithOwner.activities(activityKey);
       expect(activity.exists).to.be.false;
       
     })
   });
+}
+
+function addDays(date: Date, days: number) {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
 }
