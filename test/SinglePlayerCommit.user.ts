@@ -170,6 +170,10 @@ export function userCanManageCommitments(): void {
       const _updatedUserDaiBalanceInContract: BigNumber = await contractWithUser.committerBalances(userAddress);
       const _updatedCommitterBalance: BigNumber = await contractWithUser.totalCommitterBalance();
 
+      const timestamp = await ethers.provider.getBlockNumber()
+      .then((blockNumber) => ethers.provider.getBlock(blockNumber))
+      .then((block) => block.timestamp);
+
       expect(_updatedUserBalance.lt(_userBalance)).to.be.true;
       expect(_updatedUserDaiBalanceInContract.lt(_userDaiBalanceInContract));
       expect(_updatedCommitterBalance.lt(_committerBalance));
@@ -178,9 +182,8 @@ export function userCanManageCommitments(): void {
       expect(activityName).to.equal("biking");
       expect(commitment.goalValue.toNumber()).to.equal(_goalValue);
       expect(commitment.stake).to.equal(_amountToStake);
-        //TODO check startime against block.timestamp and same for endTime
-      // expect(commitment.startTime).to.equal(_daysToStart);
-      // expect(commitment.endTime.lt(_daysToStart));
+      expect(commitment.startTime.eq(timestamp));
+      expect(commitment.endTime.eq(addDays(timestamp, _amountOfDays)));
       expect(commitment.met).to.be.false; 
       expect(commitment.exists).to.be.true;
       expect(commitment.userId).to.not.be.undefined; //TODO can be more specific?
@@ -285,6 +288,9 @@ export function userCanManageCommitments(): void {
       const _updatedUserBalance: BigNumber = await user.getBalance();
       const _updatedUserDaiBalanceInContract: BigNumber = await contractWithUser.committerBalances(userAddress);
       const _updatedCommitterBalance: BigNumber = await contractWithUser.totalCommitterBalance();
+      const timestamp = await ethers.provider.getBlockNumber()
+      .then((blockNumber) => ethers.provider.getBlock(blockNumber))
+      .then((block) => block.timestamp);
 
       expect(_updatedUserBalance.lt(_userBalance)).to.be.true;
       expect(_updatedUserDaiBalanceInContract.lt(_userDaiBalanceInContract));
@@ -294,9 +300,8 @@ export function userCanManageCommitments(): void {
       expect(activityName).to.equal("biking");
       expect(commitment.goalValue.toNumber()).to.equal(_goalValue);
       expect(commitment.stake).to.equal(_amountToStake);
-      //TODO check startTime against block.timestamp
-      // expect(commitment.startTime).to.equal(_daysToStart);
-      // expect(commitment.endTime.gt(commitment.startTime));
+      expect(commitment.startTime.eq(timestamp));
+      expect(commitment.endTime.eq(addDays(timestamp, _amountOfDays)));
       expect(commitment.met).to.be.false; 
       expect(commitment.exists).to.be.true;
       expect(commitment.userId).to.not.be.undefined; //TODO can be more specific?
